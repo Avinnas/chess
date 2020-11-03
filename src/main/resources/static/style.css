@@ -1,0 +1,18 @@
+.board {
+    display: inline-block;
+    border: 2px solid lightGray;
+}
+
+.board div {
+    line-height: 1px;
+}
+
+.board span {
+    color: red;
+    text-align: center;
+    display: inline-block;
+    width: 84px;
+    height: 84px;
+    line-height: 84px;
+    background-color: snow;
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org" >
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Szachy</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+</head>
+
+
+<body>
+<div>
+    <div class="board" id="chessBoard"></div>
+
+    <p> test sdfsdf23222dsfzczx</p>
+    <div th:text="${string}"></div>
+    <div th:text="abc"></div>
+    <div th:text="${boardTiles}"> </div>
+    What the fck
+</div>
+
+
+</body>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    function drawBoard(x, y, color) {
+        var chessBoard = document.getElementById("chessBoard");
+        for (var i = 0; i < x; i++) {
+            var row = chessBoard.appendChild(document.createElement("div"));
+            for (var j = 0; j < y; j++) {
+                var span = document.createElement('span');
+                span.id = "tile-" + (i * 8 +j).toString();
+                span.className = "tile"
+                if(i & 1){
+                    if(j & 1){
+
+                    } else {
+                        span.style.backgroundColor = color;
+                    }
+                } else {
+                    if(j & 1){
+                        span.style.backgroundColor = color;
+                    }
+                }
+
+                row.appendChild(span);
+            }
+        }
+    }
+
+    function drawPieces(tiles){
+        for(const tileId in tiles){
+            let element = document.getElementById("tile-"+tileId)
+            element.addEventListener("click", showMoves)
+            element.innerHTML = tiles[tileId].name;
+        }
+    }
+
+    function showMoves(moves){
+
+    }
+
+    function reset(){
+        ;
+    }
+
+    drawBoard(8,8, "black")
+    const boardTilesString = /*[[${boardTiles}]]*/  'default'
+    console.log(boardTilesString)
+    let boardTiles = JSON.parse(boardTilesString);
+    console.log(boardTiles["0"]);
+    drawPieces(boardTiles)
+
+    /*]]>*/
+</script>
