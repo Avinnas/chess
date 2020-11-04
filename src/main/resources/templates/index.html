@@ -57,25 +57,60 @@
     function drawPieces(tiles){
         for(const tileId in tiles){
             let element = document.getElementById("tile-"+tileId)
-            element.addEventListener("click", showMoves)
             element.innerHTML = tiles[tileId].name;
         }
     }
 
-    function showMoves(moves){
+    function handleReset(){
+        function removeMoveMarkers(){
+            let elements = document.getElementsByClassName("marker");
+            while(elements.length > 0){
+                elements[0].parentNode.removeChild(elements[0]);
+            }
+        }
+    }
+
+    function handlePieceClick(id){
+        alert("event fired")
+        const moves = getMoves();
+        for(const tileToMoveId of moves[id]){
+            console.log(tileToMoveId);
+            let parentSpan = document.getElementById("tile-"+tileToMoveId)
+            let div = document.createElement("div");
+            div.className = "marker"
+
+            parentSpan.appendChild(div);
+        }
 
     }
 
-    function reset(){
+    function addMoveEventToPieces(){
+        const moves = getMoves();
+        for(const tileId in moves){
+            let element = document.getElementById("tile-"+tileId)
+            element.addEventListener("click", () => handlePieceClick(tileId))
+        }
+    }
+
+
+
+    function handleResetClick(){
         ;
     }
 
+    function getMoves(){
+        return {50: [42, 34]}
+    }
     drawBoard(8,8, "black")
     const boardTilesString = /*[[${boardTiles}]]*/  'default'
     console.log(boardTilesString)
     let boardTiles = JSON.parse(boardTilesString);
     console.log(boardTiles["0"]);
     drawPieces(boardTiles)
+
+    addMoveEventToPieces();
+
+    document.getElementById("tile-16").addEventListener("click", handleReset)
 
     /*]]>*/
 </script>

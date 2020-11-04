@@ -21,6 +21,14 @@ public abstract class Piece {
         this.color = color;
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +
+                "tileNumber=" + tileNumber +
+                ", color=" + color +
+                '}';
+    }
+
     public abstract List<Integer> findPossibleMoves(Board board);
 
     public int getTileNumber() {

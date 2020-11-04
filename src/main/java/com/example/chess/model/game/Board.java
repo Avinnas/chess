@@ -2,6 +2,7 @@ package com.example.chess.model.game;
 
 import com.example.chess.model.pieces.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Map;
 public class Board {
     HashMap<Integer, Piece> tilePieceAssignment;
    // # 0 - white,
-    List<Map<String, Piece[]>> piecesByType;
+    List<Map<String, List<Piece>>> piecesByType;
 
 
     public Board() {
@@ -64,21 +65,43 @@ public class Board {
         fillPiecesByType();
     }
     private void fillPiecesByType(){
-//        HashMap<String, Piece> whitePiecesByType = new HashMap<>();
-//        HashMap<String, Piece> blackPiecesByType = new HashMap<>();
-//        for (Piece piece: tilePieceAssignment.values()) {
-//            if (piece.getColor() == Color.WHITE){
-//                whitePiecesByType.
-//                whitePiecesByType.put(piece.getClass().getSimpleName(), piece);
-//            }
-//            else
-//                blackPiecesByType.put(piece.getClass().getSimpleName(), piece);
-//        }
-//        piecesByType = new ArrayList<>();
-//
-//        // TODO -> KAŻDY KLUCZ POWINIEN PRZYJMOWAć LISTE BIEREK
-//        piecesByType.add(whitePiecesByType);
-//        piecesByType.add(blackPiecesByType);
+        HashMap<String, List<Piece>> whitePiecesByType = new HashMap<>();
+        HashMap<String, List<Piece>> blackPiecesByType = new HashMap<>();
+
+        for (Piece piece: tilePieceAssignment.values()) {
+            String pieceClass = piece.getClass().getSimpleName();
+            if (piece.getColor() == Color.WHITE){
+                var existingPieces = whitePiecesByType.get(pieceClass);
+                    if(existingPieces != null){
+                        existingPieces.add(piece);
+                        whitePiecesByType.put(pieceClass, existingPieces);
+                    }
+                    else
+                    {
+                        var temp = new ArrayList<Piece>();
+                        temp.add(piece);
+                        whitePiecesByType.put(pieceClass, temp);
+                    }
+            }
+            else
+            {
+                var existingPieces = blackPiecesByType.get(pieceClass);
+                if(existingPieces != null){
+                    existingPieces.add(piece);
+                    blackPiecesByType.put(pieceClass, existingPieces);
+                }
+                else
+                {
+                    var temp = new ArrayList<Piece>();
+                    temp.add(piece);
+                    blackPiecesByType.put(pieceClass, temp);
+                }
+            }
+        }
+        piecesByType = new ArrayList<>();
+
+        piecesByType.add(whitePiecesByType);
+        piecesByType.add(blackPiecesByType);
     }
     public HashMap<?,?> findAllPossibleMoves(){
         HashMap<Integer, List<Integer>> possibleMoves = new HashMap<>();
@@ -95,8 +118,11 @@ public class Board {
     public HashMap<Integer, Piece> getTilePieceAssignment() {
         return tilePieceAssignment;
     }
+    public Map<String, List<Piece>> getPlayerPieces(Color color){
+        return piecesByType.get(color.getValue());
+    }
 
-    public List<Map<String, Piece[]>> getPiecesByType() {
+    public List<Map<String, List<Piece>>> getPiecesByType() {
         return piecesByType;
     }
 
@@ -106,5 +132,8 @@ public class Board {
     public boolean tileIsOccupiedByOpponent(int tileNumber, Color pieceColor){
         return !tileIsEmpty(tileNumber) && tilePieceAssignment.get(tileNumber).getColor()!=pieceColor;
     }
+
+
+
 
 }
