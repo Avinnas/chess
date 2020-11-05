@@ -4,6 +4,7 @@ import com.example.chess.model.game.Board;
 import com.example.chess.model.game.Color;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonTypeName("King")
@@ -17,6 +18,6 @@ public class King extends Piece{
 
     @Override
     public List<Integer> findPossibleMoves(Board board) {
-        return null;
+        return new ArrayList<>();
     }
 }

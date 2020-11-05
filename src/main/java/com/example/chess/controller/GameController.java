@@ -11,8 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
@@ -37,9 +36,19 @@ public class GameController {
     }
 
     @GetMapping("/player_pieces")
-    public Map<?,?> showPlayerPieces(int tile){
-        return game.getPlayerPieces();
+    @ResponseBody
+    public String showPlayerPieces() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(game.getPlayerPieces());
     }
+
+    @GetMapping("/player_moves")
+    @ResponseBody
+    public String showPlayerMoves() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(game.getPossibleCurrentPlayerMoves());
+    }
+
 
 
 }

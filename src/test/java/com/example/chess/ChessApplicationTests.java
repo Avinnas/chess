@@ -22,7 +22,7 @@ class ChessApplicationTests {
 	@Test
 	void boardTest(){
 		Board board = new Board();
-		System.out.println(board.getPiecesByType());
+		System.out.println(board.getPiecesByType().get(0).values());
 	}
 
 }

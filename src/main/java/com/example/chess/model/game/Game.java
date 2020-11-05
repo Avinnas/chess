@@ -13,13 +13,15 @@ public class Game {
     Board board;
 
 
-    Color playerColor;
+    Color humanPlayerColor;
+
     Color currentPlayer;
     List<Move> movesPlayed;
 
     public Game() {
         board = new Board();
-        playerColor = Color.WHITE;
+        humanPlayerColor = Color.WHITE;
+        currentPlayer = Color.WHITE;
 
     }
 
@@ -29,13 +31,13 @@ public class Game {
         return board.getTilePieceAssignment();
     }
 
-    public HashMap<?,?> getPossibleMoves(){
+    public HashMap<?,?> getPossibleCurrentPlayerMoves(){
 
-        return board.findAllPossibleMoves();
+        return board.findCurrentPlayerMoves(currentPlayer);
     }
 
     public Map<String, List<Piece>> getPlayerPieces(){
-        return board.getPlayerPieces(playerColor);
+        return board.getPlayerPieces(humanPlayerColor);
     }
 
 }

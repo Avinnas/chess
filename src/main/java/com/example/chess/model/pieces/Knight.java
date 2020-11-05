@@ -34,7 +34,7 @@ public class Knight extends Piece {
         if(column>5){
             relativePossibleMoves.remove(Integer.valueOf(10));
             relativePossibleMoves.remove(Integer.valueOf(-6));
-            if(row==7){
+            if(column==7){
                 relativePossibleMoves.remove(Integer.valueOf(17));
                 relativePossibleMoves.remove(Integer.valueOf(-15));
             }

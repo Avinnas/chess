@@ -18,7 +18,10 @@
 }
 
 .marker {
+    margin-top: 37px;
+    margin-left: 37px;
     height: 10px;
     width: 10px;
     background-color: red;
+    vertical-align: middle;
 }

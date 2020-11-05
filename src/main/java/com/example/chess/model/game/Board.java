@@ -103,15 +103,20 @@ public class Board {
         piecesByType.add(whitePiecesByType);
         piecesByType.add(blackPiecesByType);
     }
-    public HashMap<?,?> findAllPossibleMoves(){
+    public HashMap<?,?> findCurrentPlayerMoves(Color currentColor){
         HashMap<Integer, List<Integer>> possibleMoves = new HashMap<>();
-        for (Piece piece: tilePieceAssignment.values()) {
+        System.out.println(piecesByType.get(0).values());
+        for (List<Piece> piecesTypeList : piecesByType.get(currentColor.getValue()).values()){
+            for (Piece piece: piecesTypeList) {
 
-            List<Integer> tiles = piece.findPossibleMoves(this);
-            for(Integer tile : tiles){
-                possibleMoves.put(piece.getTileNumber(), tiles);
+                List<Integer> tiles = piece.findPossibleMoves(this);
+                if(!tiles.isEmpty()){
+                    possibleMoves.put(piece.getTileNumber(), tiles);
+                }
+
             }
         }
+
         return possibleMoves;
     }
 
