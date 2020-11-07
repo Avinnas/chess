@@ -20,5 +20,19 @@ public class Move {
 
     }
 
+    public int getStartTile() {
+        return startTile;
+    }
 
+    public int getDestinationTile() {
+        return destinationTile;
+    }
+
+    public String getPieceType() {
+        return pieceType;
+    }
+
+    public Color getPieceColor() {
+        return pieceColor;
+    }
 }

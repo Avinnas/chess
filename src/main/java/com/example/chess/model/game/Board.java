@@ -1,5 +1,6 @@
 package com.example.chess.model.game;
 
+import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.pieces.*;
 
 import java.util.ArrayList;
@@ -103,9 +104,8 @@ public class Board {
         piecesByType.add(whitePiecesByType);
         piecesByType.add(blackPiecesByType);
     }
-    public HashMap<?,?> findCurrentPlayerMoves(Color currentColor){
+    public HashMap<Integer, List<Integer>> findCurrentPlayerMoves(Color currentColor){
         HashMap<Integer, List<Integer>> possibleMoves = new HashMap<>();
-        System.out.println(piecesByType.get(0).values());
         for (List<Piece> piecesTypeList : piecesByType.get(currentColor.getValue()).values()){
             for (Piece piece: piecesTypeList) {
 
@@ -118,6 +118,28 @@ public class Board {
         }
 
         return possibleMoves;
+    }
+
+    public Move makeMove(int actualTileId, int destinationTileId){
+        Piece newPiece = tilePieceAssignment.remove(actualTileId);
+        Move moveMade = new Move(destinationTileId, newPiece);
+
+        List<Piece> pieceList = piecesByType.get(newPiece.getColor().getValue()).get(newPiece.getName());
+        pieceList.remove(newPiece);
+        newPiece.setTileNumber(destinationTileId);
+        pieceList.add(newPiece);
+        piecesByType.get(newPiece.getColor().getValue()).put(newPiece.getName(), pieceList);
+
+        // TODO - usuwanie zbitej bierki z hashmapy
+
+        tilePieceAssignment.remove(actualTileId);
+        tilePieceAssignment.put(destinationTileId, newPiece);
+
+        return moveMade;
+    }
+
+    public Move makeMove(MoveDto moveToMake){
+        return makeMove(moveToMake.getActualTileId(), moveToMake.getDestinationId());
     }
 
     public HashMap<Integer, Piece> getTilePieceAssignment() {

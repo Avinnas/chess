@@ -1,27 +1,33 @@
+body{
+    background-color: gray;
+}
+
 .board {
-    display: inline-block;
+
     border: 2px solid lightGray;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: calc(84px * 8);
+    height: calc(84px * 8);
 }
 
-.board div {
-    line-height: 1px;
-}
-
-.board span {
+.board .tile {
+    background-color: #ecdbb0;
     color: red;
     text-align: center;
-    display: inline-block;
     width: 84px;
     height: 84px;
-    line-height: 84px;
-    background-color: snow;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .marker {
-    margin-top: 37px;
-    margin-left: 37px;
     height: 10px;
     width: 10px;
     background-color: red;
-    vertical-align: middle;
 }
