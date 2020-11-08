@@ -4,17 +4,29 @@ import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.pieces.Piece;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 import java.util.*;
 
 @Component
+@Entity
 public class Game {
 
+    @Id
+    int id;
+
+    @ManyToOne
+    Player player;
+
+    @Transient
     Board board;
 
-
     Color humanPlayerColor;
-
     Color currentPlayer;
+
+    @Transient
     List<Move> movesPlayed;
 
     public Game() {

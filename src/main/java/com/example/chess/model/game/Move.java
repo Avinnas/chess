@@ -1,7 +1,15 @@
 package com.example.chess.model.game;
+
 import com.example.chess.model.pieces.Piece;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Move {
+
+    @Id
+    int id;
 
     int startTile;
     int destinationTile;
@@ -10,6 +18,9 @@ public class Move {
 
     public String toString(){
         return "\n" + startTile + " --> " + destinationTile + " " + pieceColor + " " + pieceType;
+    }
+    public Move(){
+
     }
 
     public Move(int destinationTile, Piece piece){

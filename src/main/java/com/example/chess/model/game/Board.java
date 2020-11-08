@@ -120,20 +120,37 @@ public class Board {
         return possibleMoves;
     }
 
-    public Move makeMove(int actualTileId, int destinationTileId){
-        Piece newPiece = tilePieceAssignment.remove(actualTileId);
-        Move moveMade = new Move(destinationTileId, newPiece);
+    public void removePieceAfterCapturing(Piece pieceToRemove){
 
-        List<Piece> pieceList = piecesByType.get(newPiece.getColor().getValue()).get(newPiece.getName());
-        pieceList.remove(newPiece);
-        newPiece.setTileNumber(destinationTileId);
-        pieceList.add(newPiece);
-        piecesByType.get(newPiece.getColor().getValue()).put(newPiece.getName(), pieceList);
+
+        piecesByType
+                .get(pieceToRemove.getColor().getValue())
+                .get(pieceToRemove.getName())
+                .remove(pieceToRemove);
+
+        System.out.println(piecesByType.get(pieceToRemove.getColor().getValue()));
+
+    }
+
+    public Move makeMove(int actualTileId, int destinationTileId){
+        Piece piece = tilePieceAssignment.remove(actualTileId);
+        Move moveMade = new Move(destinationTileId, piece);
+
+        if(tilePieceAssignment.containsKey(destinationTileId)){
+            removePieceAfterCapturing(tilePieceAssignment.get(destinationTileId));
+        }
+
+
+        List<Piece> pieceList = piecesByType.get(piece.getColor().getValue()).get(piece.getName());
+        pieceList.remove(piece);
+        piece.setTileNumber(destinationTileId);
+        pieceList.add(piece);
+        piecesByType.get(piece.getColor().getValue()).put(piece.getName(), pieceList);
 
         // TODO - usuwanie zbitej bierki z hashmapy
 
         tilePieceAssignment.remove(actualTileId);
-        tilePieceAssignment.put(destinationTileId, newPiece);
+        tilePieceAssignment.put(destinationTileId, piece);
 
         return moveMade;
     }
