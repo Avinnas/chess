@@ -1,12 +1,14 @@
 package com.example.chess;
 
-import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.game.Game;
+import com.example.chess.model.game.Move;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class ChessApplicationTests {
+
+
 
 	@Test
 	void contextLoads() {
@@ -18,11 +20,13 @@ class ChessApplicationTests {
 		Game game = new Game();
 		System.out.println(game.getBoardState());
 
-		game.makePlayerMove(new MoveDto(55,47));
+		game.makePlayerMove(new Move(55,47));
 		game.makeAIMove();
 
 		System.out.println(game.getBoardState());
 	}
+
+
 
 	@Test
 	void boardTest(){

@@ -1,6 +1,5 @@
 package com.example.chess.model.game;
 
-import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.pieces.*;
 
 import java.util.ArrayList;
@@ -131,14 +130,39 @@ public class Board {
         System.out.println(piecesByType.get(pieceToRemove.getColor().getValue()));
 
     }
+    public String calculateHash(Move move, boolean isCapture){
+        String hash = "";
+        Piece piece = this.tilePieceAssignment.get(move.getStartTile());
+        if (!piece.getName().equals("Pawn")) {
+            hash += piece.getName().charAt(0);
+        }
+        if(isCapture){
+            hash += 'x';
+        }
+        hash += tileHash(move.getDestinationTile());
+        return hash;
+    }
+
+    public String tileHash(int tileId){
+        int row = 8-(tileId / 8) ;
+        String column = String.valueOf((char)((tileId % 8) +96));
+
+        return column + row;
+    }
 
     public Move makeMove(int actualTileId, int destinationTileId){
-        Piece piece = tilePieceAssignment.remove(actualTileId);
-        Move moveMade = new Move(destinationTileId, piece);
+
+        // TODO hash nie jest obliczany w ruchach gracza.
+        Move moveMade = new Move(actualTileId,destinationTileId);
 
         if(tilePieceAssignment.containsKey(destinationTileId)){
             removePieceAfterCapturing(tilePieceAssignment.get(destinationTileId));
+            moveMade.setHash(calculateHash(moveMade, true));
         }
+        else{
+            moveMade.setHash(calculateHash(moveMade, false));
+        }
+        Piece piece = tilePieceAssignment.remove(actualTileId);
 
 
         List<Piece> pieceList = piecesByType.get(piece.getColor().getValue()).get(piece.getName());
@@ -147,7 +171,6 @@ public class Board {
         pieceList.add(piece);
         piecesByType.get(piece.getColor().getValue()).put(piece.getName(), pieceList);
 
-        // TODO - usuwanie zbitej bierki z hashmapy
 
         tilePieceAssignment.remove(actualTileId);
         tilePieceAssignment.put(destinationTileId, piece);
@@ -155,8 +178,8 @@ public class Board {
         return moveMade;
     }
 
-    public Move makeMove(MoveDto moveToMake){
-        return makeMove(moveToMake.getActualTileId(), moveToMake.getDestinationId());
+    public Move makeMove(Move moveToMake){
+        return makeMove(moveToMake.getStartTile(), moveToMake.getDestinationTile());
     }
 
     public HashMap<Integer, Piece> getTilePieceAssignment() {

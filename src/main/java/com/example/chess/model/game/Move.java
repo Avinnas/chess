@@ -1,34 +1,49 @@
 package com.example.chess.model.game;
 
 import com.example.chess.model.pieces.Piece;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "moves")
 public class Move {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
 
     int startTile;
     int destinationTile;
-    String pieceType;
-    Color pieceColor;
+
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    @JsonBackReference
+    Game game;
+
+    String hash;
+
+    @Transient
+    boolean isCapture;
 
     public String toString(){
-        return "\n" + startTile + " --> " + destinationTile + " " + pieceColor + " " + pieceType;
+        return "\n" + startTile + " --> " + destinationTile;
     }
     public Move(){
 
     }
 
-    public Move(int destinationTile, Piece piece){
-        this.startTile = piece.getTileNumber();
-        this.destinationTile = destinationTile;
-        this.pieceType = piece.getClass().getSimpleName();
-        this.pieceColor = piece.getColor();
+    public void setGame(Game game) {
+        this.game = game;
+    }
 
+    public Move(int startTile, int destinationTile) {
+        this.startTile = startTile;
+        this.destinationTile = destinationTile;
+    }
+
+    public Move(int destinationTile, Piece piece){
+        this(piece.getTileNumber(), destinationTile);
     }
 
     public int getStartTile() {
@@ -39,11 +54,39 @@ public class Move {
         return destinationTile;
     }
 
-    public String getPieceType() {
-        return pieceType;
+    public Game getGame() {
+        return game;
     }
 
-    public Color getPieceColor() {
-        return pieceColor;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setStartTile(int startTile) {
+        this.startTile = startTile;
+    }
+
+    public void setDestinationTile(int destinationTile) {
+        this.destinationTile = destinationTile;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public boolean isCapture() {
+        return isCapture;
+    }
+
+    public void setCapture(boolean capture) {
+        isCapture = capture;
     }
 }

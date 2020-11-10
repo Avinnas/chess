@@ -18,9 +18,6 @@
     <div class="board" id="chessBoard"></div>
 
     <p> test sdfsdf23222dsfzczx</p>
-    <div th:text="${string}"></div>
-    <div th:text="abc"></div>
-    <div th:text="${boardTiles}"></div>
     What the fck
 </div>
 
@@ -117,8 +114,9 @@
 
     async function makeAIMove(){
         let move = await getLastAIMove()
-        movePieceAtInterface(move.actualTileId, move.destinationId)
         console.log(move)
+        movePieceAtInterface(move.startTile, move.destinationTile)
+
     }
 
     async function getLastAIMove(){
@@ -136,8 +134,8 @@
 
     async function sendMove(pieceId, destinationId) {
         var move = {
-            actualTileId: pieceId,
-            destinationId: destinationId
+            startTile: pieceId,
+            destinationTile: destinationId
         }
         await $.ajax({
             type: "POST",
@@ -153,6 +151,7 @@
     }
 
     function movePieceAtInterface(pieceId, destinationId) {
+        alert(pieceId + " " + destinationId)
         let startElement = document.getElementById("tile-" + pieceId);
         let text = startElement.innerHTML;
         startElement.innerHTML = ''
@@ -167,7 +166,7 @@
     }
 
     async function addMoveEventToPieces() {
-        const moves = JSON.parse(await getMoves());
+        const moves = await getMoves();
         for (const tileId in moves) {
             let element = document.getElementById("tile-" + tileId)
             element.addEventListener("click", () => handlePieceClick(tileId, moves[tileId]))
@@ -192,6 +191,7 @@
                 url: "game/current_state",
                 success: function (data) {
                     state = data
+                    console.log(state)
                 }
             }
         )
@@ -200,9 +200,7 @@
 
     $(document).ready(async function () {
         drawBoard(8, 8, "#af875f")
-        const boardTilesString = /*[[${boardTiles}]]*/  'default'
-        let boardTiles = JSON.parse(boardTilesString);
-        drawPieces(JSON.parse(await getCurrentState()))
+        drawPieces(await getCurrentState())
 
         await addMoveEventToPieces();
 

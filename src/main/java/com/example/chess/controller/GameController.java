@@ -1,25 +1,28 @@
 package com.example.chess.controller;
 
 
-import com.example.chess.model.dto.MoveDto;
-import com.example.chess.model.game.Game;
-import com.example.chess.model.game.GameRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.chess.model.game.Move;
+import com.example.chess.model.pieces.Piece;
+import com.example.chess.service.GameService;
+import com.example.chess.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
 @RequestMapping("/game")
 public class GameController {
 
-    Game game;
-    GameRepository gameRepository;
+    GameService gameService;
+    UserService userService;
 
-    public GameController(Game game, GameRepository gameRepository) {
-        this.game = game;
-        this.gameRepository = gameRepository;
+    public GameController(GameService gameService, UserService userService) {
+        this.gameService = gameService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -27,40 +30,35 @@ public class GameController {
         return "game";
     }
 
-    public String toJSON(Object object) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(object);
-    }
 
     @GetMapping("/current_state")
     @ResponseBody
-    public String showCurrentState() throws JsonProcessingException{
-        return toJSON(game.getBoardState());
+    public HashMap<Integer, Piece> showCurrentState() {
+        return gameService.getCurrentPlayerGameState();
     }
 
     @GetMapping("/player_pieces")
     @ResponseBody
-    public String showPlayerPieces() throws JsonProcessingException {
-        return toJSON(game.getPlayerPieces());
+    public Map<String, List<Piece>> showPlayerPieces() {
+        return gameService.getPlayerPieces();
     }
 
     @GetMapping("/player_moves")
     @ResponseBody
-    public String showPlayerMoves() throws JsonProcessingException {
-        return toJSON(game.getPossibleCurrentPlayerMoves());
+    public HashMap<Integer, List<Integer>> showPlayerMoves() {
+        return gameService.getPossibleCurrentPlayerMoves();
     }
 
     @PostMapping
     @ResponseBody
-    public void newMove(@RequestBody MoveDto moveToMake){
-        game.newMove(moveToMake);
-
+    public void newMove(@RequestBody Move moveToMake) throws CloneNotSupportedException {
+        gameService.newMove(moveToMake);
     }
 
     @GetMapping("/last_move")
     @ResponseBody
-    public MoveDto showLastMove(){
-        return game.getLastAIMove();
+    public Move showLastMove(){
+        return gameService.getLastAIMove();
     }
 
 

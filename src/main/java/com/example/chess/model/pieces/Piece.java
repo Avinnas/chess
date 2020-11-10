@@ -3,12 +3,10 @@ package com.example.chess.model.pieces;
 
 import com.example.chess.model.game.Board;
 import com.example.chess.model.game.Color;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public abstract class Piece {
 
     final String name;
