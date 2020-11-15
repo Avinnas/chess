@@ -12,4 +12,13 @@ public enum Color {
     public int getValue(){
         return value;
     }
+
+    public Color getOpponentColor(){
+        if(this == Color.WHITE){
+            return Color.BLACK;
+        }
+        else {
+            return Color.WHITE;
+        }
+    }
 }

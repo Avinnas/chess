@@ -9,7 +9,7 @@ import java.util.List;
 
 public abstract class Piece {
 
-    final String name;
+    protected final String name;
     protected int tileNumber;
     protected Color color;
 

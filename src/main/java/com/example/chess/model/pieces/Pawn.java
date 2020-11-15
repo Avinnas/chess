@@ -17,39 +17,45 @@ public class Pawn extends Piece {
     @Override
     public List<Integer> findPossibleMoves(Board board) {
         List<Integer> possibleMoves = new ArrayList<>();
-//        int row = tileNumber / 8;
-//        if (this.color == game.Color.WHITE) {
-//            if (row == 6) {
-//                if (board.getTile(tileNumber - 16).isEmpty()
-//                        && board.getTile(tileNumber - 8).isEmpty()) {
-//                    possibleMoves.add(tileNumber - 16);
-//                }
-//            }
-//            if (board.getTile(tileNumber - 8).isEmpty())
-//                possibleMoves.add(tileNumber - 8);
-//            if (board.getTile(tileNumber - 7).isOccupiedByOpponent(game.Color.WHITE)) {
-//                possibleMoves.add(tileNumber - 7);
-//            }
-//            if (board.getTile(tileNumber - 9).isOccupiedByOpponent(game.Color.WHITE)) {
-//                possibleMoves.add(tileNumber - 9);
-//            }
-//        } else if (this.color == game.Color.BLACK) {
-//            if (row == 1) {
-//                if (board.getTile(tileNumber + 16).isEmpty()
-//                        && board.getTile(tileNumber + 8).isEmpty()) {
-//                    possibleMoves.add(tileNumber + 16);
-//                }
-//            }
-//            if (board.getTile(tileNumber + 8).isEmpty())
-//                possibleMoves.add(tileNumber + 8);
-//
-//            if (board.getTile(tileNumber + 7).isOccupiedByOpponent(game.Color.BLACK)) {
-//                possibleMoves.add(tileNumber + 7);
-//            }
-//            if (board.getTile(tileNumber + 9).isOccupiedByOpponent(game.Color.BLACK)) {
-//                possibleMoves.add(tileNumber + 9);
-//            }
-//        }
+        int row = tileNumber / 8 +1;
+        if(this.color == Color.WHITE){
+            int destinationTile = tileNumber -8;
+            if(board.tileIsEmpty(destinationTile)){
+                possibleMoves.add(destinationTile);
+                destinationTile -= 8;
+                if(row == 7 && (board.tileIsEmpty(destinationTile))){
+                    possibleMoves.add(destinationTile);
+                }
+            }
+            if(board.tileIsOccupiedByOpponent(tileNumber - 7, color)){
+                possibleMoves.add(tileNumber - 7);
+            }
+            if(board.tileIsOccupiedByOpponent(tileNumber - 9, color)){
+                possibleMoves.add(tileNumber - 9);
+            }
+
+        }
+
+        else{
+
+            int destinationTile = tileNumber + 8;
+            if(board.tileIsEmpty(destinationTile)){
+                possibleMoves.add(destinationTile);
+                destinationTile += 8;
+                if(row == 2 && (board.tileIsEmpty(destinationTile))){
+                    possibleMoves.add(destinationTile);
+                }
+            }
+            if(board.tileIsOccupiedByOpponent(tileNumber + 7, color)){
+                possibleMoves.add(tileNumber + 7);
+            }
+            if(board.tileIsOccupiedByOpponent(tileNumber + 9, color)){
+                possibleMoves.add(tileNumber + 9);
+            }
+
+
+
+        }
 
         return possibleMoves;
     }

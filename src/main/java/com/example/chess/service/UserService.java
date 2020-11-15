@@ -1,5 +1,6 @@
 package com.example.chess.service;
 
+import com.example.chess.model.game.User;
 import com.example.chess.model.game.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,4 +16,12 @@ public class UserService {
     public int getCurrentPlayerId(){
         return 0;
     }
-}
+
+    public User findById(int userId){
+        return userRepository.findById(userId).orElseThrow();
+    }
+    public User getCurrentPlayer(){
+        return userRepository.findById(getCurrentPlayerId()).orElseThrow();
+        }
+    }
+

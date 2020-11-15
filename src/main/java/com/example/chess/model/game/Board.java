@@ -134,7 +134,12 @@ public class Board {
         String hash = "";
         Piece piece = this.tilePieceAssignment.get(move.getStartTile());
         if (!piece.getName().equals("Pawn")) {
-            hash += piece.getName().charAt(0);
+            if(piece.getName().equals("Knight")){
+                hash += 'N';
+            }
+            else{
+                hash += piece.getName().charAt(0);
+            }
         }
         if(isCapture){
             hash += 'x';
@@ -145,14 +150,13 @@ public class Board {
 
     public String tileHash(int tileId){
         int row = 8-(tileId / 8) ;
-        String column = String.valueOf((char)((tileId % 8) +96));
+        String column = String.valueOf((char)((tileId % 8) +97));
 
         return column + row;
     }
 
     public Move makeMove(int actualTileId, int destinationTileId){
 
-        // TODO hash nie jest obliczany w ruchach gracza.
         Move moveMade = new Move(actualTileId,destinationTileId);
 
         if(tilePieceAssignment.containsKey(destinationTileId)){
@@ -166,13 +170,8 @@ public class Board {
 
 
         List<Piece> pieceList = piecesByType.get(piece.getColor().getValue()).get(piece.getName());
-        pieceList.remove(piece);
-        piece.setTileNumber(destinationTileId);
-        pieceList.add(piece);
-        piecesByType.get(piece.getColor().getValue()).put(piece.getName(), pieceList);
+        pieceList.get(pieceList.indexOf(piece)).setTileNumber(destinationTileId);
 
-
-        tilePieceAssignment.remove(actualTileId);
         tilePieceAssignment.put(destinationTileId, piece);
 
         return moveMade;
@@ -201,6 +200,7 @@ public class Board {
     }
 
 
-
-
+    public void calculateState(List<Move> moves) {
+        moves.forEach(this::makeMove);
+    }
 }

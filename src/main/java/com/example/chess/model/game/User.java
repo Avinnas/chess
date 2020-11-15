@@ -16,7 +16,7 @@ public class User {
     String lastname;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Game> games;
 
     public User() {

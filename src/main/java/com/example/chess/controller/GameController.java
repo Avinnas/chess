@@ -51,7 +51,7 @@ public class GameController {
 
     @PostMapping
     @ResponseBody
-    public void newMove(@RequestBody Move moveToMake) throws CloneNotSupportedException {
+    public void newMove(@RequestBody Move moveToMake)  {
         gameService.newMove(moveToMake);
     }
 
@@ -59,6 +59,12 @@ public class GameController {
     @ResponseBody
     public Move showLastMove(){
         return gameService.getLastAIMove();
+    }
+
+    @GetMapping("/finished")
+    @ResponseBody
+    public boolean checkIfFinished(){
+        return gameService.checkIfFinished();
     }
 
 

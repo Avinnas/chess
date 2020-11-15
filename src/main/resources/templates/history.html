@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Szachy</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/script.js"></script>
+
+
+</head>
+
+
+<body>
+<div>
+    <div class="board" id="chessBoard"></div>
+    <div th:text="${finishedGames}"></div>
+    <div th:text="${game}"></div>
+    <tr th:each="g: ${finishedGames}">
+        <td><a th:href="@{'/history/'+${g}}" th:text ="${g}"> Game </a> </td>
+    </tr>
+
+</div>
+
+
+</body>
+
+<!--<script th:inline="javascript">-->
+<!--    $(document).ready(async function () {-->
+<!--        drawBoard(8, 8, "#af875f")-->
+
+<!--    })-->
+<!--</script>-->

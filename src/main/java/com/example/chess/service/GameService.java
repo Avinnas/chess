@@ -1,15 +1,10 @@
 package com.example.chess.service;
 
-import com.example.chess.model.game.Game;
-import com.example.chess.model.game.GameRepository;
-import com.example.chess.model.game.Move;
+import com.example.chess.model.game.*;
 import com.example.chess.model.pieces.Piece;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -26,15 +21,26 @@ public class GameService {
         this.gameRepository = gameRepository;
         this.userService = userService;
         this.moveService = moveService;
-        this.game = getOrCreateCurrentGame();
     }
     public Game getOrCreateCurrentGame(){
-        Optional<Game> optionalGame = gameRepository.findTopByUserIdOrderByIdDesc(0);
-        return optionalGame.orElseGet(()-> gameRepository.save(new Game()));
+        User user = userService.getCurrentPlayer();
+        Optional<Game> optionalGame = gameRepository.findTopByUserIdAndFinishedIsFalseOrderByIdDesc(0);
+        if(optionalGame.isPresent()){
+            Game game = optionalGame.get();
+            game.calculateState();
+            return game;
+        }
+        else{
+            return gameRepository.save(new Game(user));
+        }
     }
 
     public HashMap<Integer, Piece> getCurrentPlayerGameState(){
-        return getOrCreateCurrentGame().getBoardState();
+        this.game = getOrCreateCurrentGame();
+
+        // TODO - obsługa przypadku, kiedy ostatni ruch był gracza i komputer musi go wykonać.
+
+        return game.getBoardState();
     }
 
     public Map<String, List<Piece>> getPlayerPieces(){
@@ -54,20 +60,28 @@ public class GameService {
 
     public void newMove(Move moveToMake) {
 
-        moveToMake.setGame(game);
         moveToMake = game.makePlayerMove(moveToMake);
+        moveToMake.setGame(game);
         moveService.addMove(moveToMake);
-
-        moveService.flushRepository();
-
+        if(game.isFinished()){
+            gameRepository.save(game);
+            gameRepository.flush();
+            return;
+        }
 
         Move AIMove = game.makeAIMove();
         AIMove.setGame(game);
         moveService.addMove(AIMove);
 
+        if(game.isFinished()){
+            gameRepository.save(game);
+        }
+
     }
 
-    public void newAIMove(){
-
+    public boolean checkIfFinished(){
+        return game.isFinished();
     }
+
+
 }

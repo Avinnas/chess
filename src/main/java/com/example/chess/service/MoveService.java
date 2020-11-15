@@ -5,6 +5,7 @@ import com.example.chess.model.game.MoveRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MoveService {
@@ -24,6 +25,9 @@ public class MoveService {
 
     public Move getLastAIMoveFromGame(int gameId){
         return moveRepository.findTopByGameIdOrderByIdDesc(gameId).orElseThrow();
+    }
+    public Optional<List<Move>> getAllMovesInGame(int gameId){
+        return moveRepository.findAllByGameId(gameId);
     }
 
     public List<Move> saveAll( Iterable<Move> moves)    {

@@ -31,3 +31,9 @@ body{
     width: 10px;
     background-color: red;
 }
+
+.move{
+    display: inline-block;
+    width: 40px;
+    background-color: darkgoldenrod;
+}

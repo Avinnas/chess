@@ -3,21 +3,19 @@ package com.example.chess.model.game;
 import com.example.chess.model.pieces.Piece;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.*;
 
 @Entity
 @Table(name = "games")
-@Component
 public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     @JsonBackReference
     User user;
@@ -26,7 +24,13 @@ public class Game {
     Board board;
 
     Color humanPlayerColor;
+    @Transient
     Color currentPlayer;
+
+    boolean finished;
+    Color wonByColor;
+
+    Date dateFinished;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "game",  cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -36,8 +40,11 @@ public class Game {
         board = new Board();
         humanPlayerColor = Color.WHITE;
         currentPlayer = Color.WHITE;
+    }
 
-
+    public Game(User user){
+        this();
+        this.user = user;
     }
 
 
@@ -56,17 +63,27 @@ public class Game {
     }
 
 
-    public Move getLastAIMove() {
-
-        return movesPlayed.get(movesPlayed.size() - 1);
-    }
+//    public Move showLastAIMove() {
+//
+//        return movesPlayed.get(movesPlayed.size() - 1);
+//    }
 
 
     public Move makePlayerMove(Move moveToMake) {
 
-        currentPlayer = Color.BLACK;
-        return board.makeMove(moveToMake);
+        moveToMake = board.makeMove(moveToMake);
+        checkIfFinished();
+        currentPlayer = currentPlayer.getOpponentColor();
+        return moveToMake;
 
+    }
+    public boolean checkIfFinished(){
+        if(getBoardState().get(35) !=null){
+            dateFinished = new Date();
+            finished = true;
+            wonByColor = currentPlayer;
+        }
+        return finished;
     }
 
     public Move makeAIMove() {
@@ -80,9 +97,21 @@ public class Game {
         int randomValue = pieceMoveList.get(generator.nextInt(pieceMoveList.size()));
 
         Move toMake = board.makeMove(randomKey, randomValue);
-        currentPlayer = Color.WHITE;
 
+        checkIfFinished();
+        currentPlayer = currentPlayer.getOpponentColor();
         return toMake;
+
+    }
+    public void calculateState() {
+        List <Move> moves = movesPlayed;
+        board.calculateState(moves);
+        if(moves.size()==0){
+            setCurrentPlayer(Color.WHITE);
+        }
+        else{
+            setCurrentPlayer(getBoardState().get(moves.get(moves.size()-1).getDestinationTile()).getColor().getOpponentColor());
+        }
 
     }
 
@@ -133,6 +162,30 @@ public class Game {
 
     public void setCurrentPlayer(Color currentPlayer) {
         this.currentPlayer = currentPlayer;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        finished = finished;
+    }
+
+    public Color getWonByColor() {
+        return wonByColor;
+    }
+
+    public void setWonByColor(Color wonByColor) {
+        this.wonByColor = wonByColor;
+    }
+
+    public Date getDateFinished() {
+        return dateFinished;
+    }
+
+    public void setDateFinished(Date dateFinished) {
+        this.dateFinished = dateFinished;
     }
 }
 

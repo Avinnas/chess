@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Game history</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/script.js"></script>
+
+
+</head>
+
+
+<body>
+<div>
+    <div class="board" id="chessBoard"></div>
+    <div th:text="${game.id}"></div>
+    <tr th:each="move: ${game.movesPlayed}">
+        <td><button class="move" th:onclick="'goToMove(\'' + ${moveStat.index+1} + '\');'" th:text ="${move.hash}"> Game </button> </td>
+    </tr>
+
+
+</div>
+
+
+</body>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var game = /*[[${game}]]*/ 'default';
+    console.log(game);
+    $(document).ready(function () {
+        drawBoard(8, 8, "#af875f")
+        drawPieces(game.boardState)
+
+    })
+    function removePieces(){
+        for(let i=0; i<64; i++){
+            let element = document.getElementById("tile-"+i)
+            element.innerHTML= ''
+        }
+    }
+    async function goToMove(moveId){
+
+        let state = await getStateAfterMove(moveId)
+        removePieces()
+        drawPieces(state);
+    }
+
+    async function getStateAfterMove(moveId){
+        var state;
+        await $.ajax({
+            url: "/history/move/"+moveId,
+            success: function (data){
+                state = data;
+            }
+        })
+        console.log(state)
+        return state;
+    }
+
+    /*]]>*/
+</script>
