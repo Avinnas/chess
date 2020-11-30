@@ -2,6 +2,11 @@ body{
     background-color: gray;
 }
 
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
 .board {
 
     border: 2px solid lightGray;

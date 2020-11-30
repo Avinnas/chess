@@ -7,7 +7,7 @@ import com.example.chess.model.game.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Piece {
+public abstract class Piece implements Cloneable{
 
     protected final String name;
     protected int tileNumber;
@@ -25,6 +25,16 @@ public abstract class Piece {
                 "tileNumber=" + tileNumber +
                 ", color=" + color +
                 '}';
+    }
+
+    @Override
+    public Piece clone() {
+        try{
+            return (Piece) super.clone();
+        } catch (CloneNotSupportedException e){
+            throw new AssertionError();
+        }
+
     }
 
     public abstract List<Integer> findPossibleMoves(Board board);

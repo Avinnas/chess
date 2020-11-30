@@ -72,6 +72,7 @@ public class Game {
     public Move makePlayerMove(Move moveToMake) {
 
         moveToMake = board.makeMove(moveToMake);
+//        movesPlayed.add(moveToMake);
         checkIfFinished();
         currentPlayer = currentPlayer.getOpponentColor();
         return moveToMake;
@@ -88,29 +89,53 @@ public class Game {
 
     public Move makeAIMove() {
 
-        var moves = getPossibleCurrentPlayerMoves();
-        Random generator = new Random();
-        var keys = moves.keySet().toArray();
-        int randomKey = (int) keys[generator.nextInt(keys.length)];
+//        var moves = getPossibleCurrentPlayerMoves();
+//        Random generator = new Random();
+//        var keys = moves.keySet().toArray();
+//        int randomKey = (int) keys[generator.nextInt(keys.length)];
+//
+//        List<Integer> pieceMoveList = moves.get(randomKey);
+//        int randomValue = pieceMoveList.get(generator.nextInt(pieceMoveList.size()));
 
-        List<Integer> pieceMoveList = moves.get(randomKey);
-        int randomValue = pieceMoveList.get(generator.nextInt(pieceMoveList.size()));
-
-        Move toMake = board.makeMove(randomKey, randomValue);
+        Move toMake = AlgorithmAI.minmax(board, 4, false).getSecond();
+        toMake = board.makeMove(toMake);
 
         checkIfFinished();
         currentPlayer = currentPlayer.getOpponentColor();
         return toMake;
 
     }
+    public void castMoveTypes(){
+        for(int i=0; i< movesPlayed.size(); i++){
+            Move move = movesPlayed.get(i);
+            if(move.getHash().equals("O-O")){
+                CastlingMove castedMove = (CastlingMove) move;
+                castedMove.calculateRookPosition(false);
+                movesPlayed.set(i, castedMove);
+            }
+            if(move.getHash().equals("O-O-O")){
+                CastlingMove castedMove = (CastlingMove) move;
+                castedMove.calculateRookPosition(true);
+                movesPlayed.set(i, castedMove);
+            }
+            if(move.getHash().contains("=")){
+                PromotionMove castedMove = (PromotionMove) move;
+                castedMove.setPromotedClass(move.getHash().charAt(move.getHash().length()-1));
+                movesPlayed.set(i, castedMove);
+            }
+        }
+    }
     public void calculateState() {
+        this.castMoveTypes();
         List <Move> moves = movesPlayed;
+
         board.calculateState(moves);
         if(moves.size()==0){
             setCurrentPlayer(Color.WHITE);
         }
         else{
-            setCurrentPlayer(getBoardState().get(moves.get(moves.size()-1).getDestinationTile()).getColor().getOpponentColor());
+            setCurrentPlayer(getBoardState().get(moves.get(moves.size()-1).getDestinationTile())
+                    .getColor().getOpponentColor());
         }
 
     }

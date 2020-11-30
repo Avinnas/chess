@@ -1,5 +1,7 @@
 package com.example.chess;
 
+import com.example.chess.model.game.AlgorithmAI;
+import com.example.chess.model.game.Board;
 import com.example.chess.model.game.Game;
 import com.example.chess.model.game.Move;
 import org.junit.jupiter.api.Test;
@@ -29,14 +31,20 @@ class ChessApplicationTests {
 
 
 	@Test
-	void boardTest(){
-//		Board board = new Board();
-//		System.out.println(board.getPiecesByType().get(0).values());
-//
-//		board.makeMove(55, 47);
-//
-//		System.out.println(board.getPiecesByType().get(0).get("Pawn"));
-//		System.out.println(board.getTilePieceAssignment());
+	void boardTest() {
+		Board board = new Board();
+
+
+		board.makeMove(63,0);
+
+
 	}
+	@Test
+	void minmaxTest(){
+		Board board = new Board();
+
+		System.out.println(AlgorithmAI.minmax(board,5, true));
+	}
+
 
 }

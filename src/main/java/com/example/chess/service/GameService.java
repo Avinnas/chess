@@ -27,6 +27,7 @@ public class GameService {
         Optional<Game> optionalGame = gameRepository.findTopByUserIdAndFinishedIsFalseOrderByIdDesc(0);
         if(optionalGame.isPresent()){
             Game game = optionalGame.get();
+
             game.calculateState();
             return game;
         }

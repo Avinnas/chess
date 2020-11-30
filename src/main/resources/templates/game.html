@@ -29,7 +29,7 @@
     $(document).ready(async function () {
         drawBoard(8, 8, "#af875f")
         drawPieces(await getCurrentState())
-
+        addResetEvent();
         await addMoveEventToPieces()
 
     })

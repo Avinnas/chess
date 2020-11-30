@@ -40,19 +40,20 @@ function drawPieces(tiles) {
 function handleReset() {
     let elements = document.getElementsByClassName("marker");
     while (elements.length > 0) {
+        recreateElement(elements[0].parentNode);
+        elements[0].parentNode.addEventListener("click", handleReset);
         elements[0].parentNode.removeChild(elements[0]);
     }
 }
 
 function handlePieceClick(id, pieceMoves) {
     handleReset();
-    console.log(pieceMoves)
     for (const tileToMoveId of pieceMoves) {
         let parentSpan = document.getElementById("tile-" + tileToMoveId)
+        parentSpan = recreateElement(parentSpan)
         let div = document.createElement("div");
         div.className = "marker"
         parentSpan.addEventListener("click", () => handleMove(id, tileToMoveId))
-
         parentSpan.appendChild(div);
     }
 
@@ -61,18 +62,21 @@ function handlePieceClick(id, pieceMoves) {
 function recreateElement(element) {
     var new_element = element.cloneNode(true);
     element.parentNode.replaceChild(new_element, element);
+    return new_element;
 }
 
 function recreateAll() {
     for (let i = 0; i < 64; i++) {
         let element = document.getElementById("tile-" + i);
         recreateElement(element);
+        element.addEventListener("click", handleReset)
     }
 }
 
 async function handleMove(pieceId, destinationId) {
     handleReset()
     recreateAll()
+    addResetEvent();
     movePieceAtInterface(pieceId, destinationId)
 
     await sendMove(pieceId, destinationId);
@@ -149,6 +153,8 @@ async function addMoveEventToPieces() {
     const moves = await getMoves();
     for (const tileId in moves) {
         let element = document.getElementById("tile-" + tileId)
+        element = recreateElement(element);
+        console.log("Adding event " + tileId)
         element.addEventListener("click", () => handlePieceClick(tileId, moves[tileId]))
     }
 }
