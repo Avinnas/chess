@@ -5,7 +5,6 @@ import com.example.chess.model.game.Color;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @JsonTypeName("Pawn")
@@ -18,6 +17,7 @@ public class Pawn extends Piece {
     public List<Integer> findPossibleMoves(Board board) {
         List<Integer> possibleMoves = new ArrayList<>();
         int row = tileNumber / 8 +1;
+        int column = tileNumber %8;
         if(this.color == Color.WHITE){
             int destinationTile = tileNumber -8;
             if(board.tileIsEmpty(destinationTile)){
@@ -27,10 +27,10 @@ public class Pawn extends Piece {
                     possibleMoves.add(destinationTile);
                 }
             }
-            if(board.tileIsOccupiedByOpponent(tileNumber - 7, color)){
+            if(board.tileIsOccupiedByOpponent(tileNumber - 7, color) && column!=7){
                 possibleMoves.add(tileNumber - 7);
             }
-            if(board.tileIsOccupiedByOpponent(tileNumber - 9, color)){
+            if(board.tileIsOccupiedByOpponent(tileNumber - 9, color) && column!=0){
                 possibleMoves.add(tileNumber - 9);
             }
 
@@ -46,10 +46,10 @@ public class Pawn extends Piece {
                     possibleMoves.add(destinationTile);
                 }
             }
-            if(board.tileIsOccupiedByOpponent(tileNumber + 7, color)){
+            if(board.tileIsOccupiedByOpponent(tileNumber + 7, color) && column!=0){
                 possibleMoves.add(tileNumber + 7);
             }
-            if(board.tileIsOccupiedByOpponent(tileNumber + 9, color)){
+            if(board.tileIsOccupiedByOpponent(tileNumber + 9, color) && column!=7){
                 possibleMoves.add(tileNumber + 9);
             }
 
@@ -62,15 +62,17 @@ public class Pawn extends Piece {
 
     @Override
     public List<Integer> findControlledTiles(Board board) {
-        if (color == Color.WHITE){
-            return new ArrayList<>(Arrays.asList(getTileNumber()-7, getTileNumber()-9));
-        }
-        else if(color == Color.BLACK)
-        {
-            return new ArrayList<>(Arrays.asList(getTileNumber()+7, getTileNumber()+9));
-        }
-        else{
-            throw new IllegalArgumentException("Color is not black nor white");
-        }
+
+        throw new IllegalStateException("Controlled tiles for pawn not implemeted");
+//        if (color == Color.WHITE){
+//            return new ArrayList<>(Arrays.asList(getTileNumber()-7, getTileNumber()-9));
+//        }
+//        else if(color == Color.BLACK)
+//        {
+//            return new ArrayList<>(Arrays.asList(getTileNumber()+7, getTileNumber()+9));
+//        }
+//        else{
+//            throw new IllegalArgumentException("Color is not black nor white");
+//        }
     }
 }

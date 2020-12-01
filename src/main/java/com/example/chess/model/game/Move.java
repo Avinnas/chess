@@ -1,5 +1,6 @@
 package com.example.chess.model.game;
 
+import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.pieces.Piece;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -7,7 +8,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "moves")
-public class Move {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public class Move{
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -23,8 +25,6 @@ public class Move {
 
     String hash;
 
-    @Transient
-    boolean isCapture;
 
     public String toString(){
         return "\n" + startTile + " --> " + destinationTile;
@@ -45,6 +45,39 @@ public class Move {
     public Move(int destinationTile, Piece piece){
         this(piece.getTileNumber(), destinationTile);
     }
+
+    public Move(MoveDto move){
+        this.startTile = move.getStartTile();
+        this.destinationTile = move.getDestinationTile();
+    }
+
+    public boolean isCapture(Board board) {
+        return board.getTilePieceAssignment().containsKey(destinationTile);
+    }
+    public void calculateHash(Board board) {
+        String temp = "";
+        Piece piece = board.getPiece(startTile);
+        if (!piece.getName().equals("Pawn")) {
+            if (piece.getName().equals("Knight")) {
+                temp += 'N';
+            } else {
+                temp += piece.getName().charAt(0);
+            }
+        }
+
+        if (isCapture(board)) {
+            temp += 'x';
+        }
+        temp += tileHash(destinationTile);
+        hash = temp;
+    }
+    public String tileHash(int tileId) {
+        int row = 8 - (tileId / 8);
+        String column = String.valueOf((char) ((tileId % 8) + 97));
+
+        return column + row;
+    }
+
 
     public int getStartTile() {
         return startTile;
@@ -80,13 +113,5 @@ public class Move {
 
     public void setHash(String hash) {
         this.hash = hash;
-    }
-
-    public boolean isCapture() {
-        return isCapture;
-    }
-
-    public void setCapture(boolean capture) {
-        isCapture = capture;
     }
 }

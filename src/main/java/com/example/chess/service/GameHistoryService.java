@@ -29,7 +29,7 @@ public class GameHistoryService {
     }
 
     public List<Game> getGameHistory(){
-        return gameRepository.findAllByUserIdAndFinishedIsTrue(userService.getCurrentPlayerId()).orElse(new ArrayList<>());
+        return gameRepository.findAllByUserId(userService.getCurrentPlayerId()).orElse(new ArrayList<>());
     }
 
     public Map<?,?> getBoardState(int moveId){

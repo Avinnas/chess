@@ -1,6 +1,7 @@
 package com.example.chess.controller;
 
 
+import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.game.Move;
 import com.example.chess.model.pieces.Piece;
 import com.example.chess.service.GameService;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Controller
@@ -39,7 +39,7 @@ public class GameController {
 
     @GetMapping("/player_pieces")
     @ResponseBody
-    public Map<String, List<Piece>> showPlayerPieces() {
+    public List<Piece> showPlayerPieces() {
         return gameService.getPlayerPieces();
     }
 
@@ -51,7 +51,7 @@ public class GameController {
 
     @PostMapping
     @ResponseBody
-    public void newMove(@RequestBody Move moveToMake)  {
+    public void newMove(@RequestBody MoveDto moveToMake)  {
         gameService.newMove(moveToMake);
     }
 

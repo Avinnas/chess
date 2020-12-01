@@ -3,25 +3,33 @@ package com.example.chess.model.dto;
 import com.example.chess.model.game.Move;
 
 public class MoveDto {
-    private final int actualTileId;
-    private final int destinationId;
+    private final int startTile;
+    private final int destinationTile;
 
-    public MoveDto(int actualTileId, int destinationId) {
-        this.actualTileId = actualTileId;
-        this.destinationId = destinationId;
+    public MoveDto(int startTile, int destinationTile) {
+        this.startTile = startTile;
+        this.destinationTile = destinationTile;
     }
 
-    public MoveDto(Move m ){
-        this.actualTileId = m.getStartTile();
-        this.destinationId = m.getDestinationTile();
+    public MoveDto(Move m){
+        this.startTile = m.getStartTile();
+        this.destinationTile = m.getDestinationTile();
     }
 
-    public int getActualTileId() {
-        return actualTileId;
+    public MoveDto() {
+        startTile = -1;
+        destinationTile = -1;
+    }
+    public String toString(){
+        return "\n" + startTile + " --> " + destinationTile;
     }
 
-    public int getDestinationId() {
-        return destinationId;
+    public int getStartTile() {
+        return startTile;
+    }
+
+    public int getDestinationTile() {
+        return destinationTile;
     }
 
 }

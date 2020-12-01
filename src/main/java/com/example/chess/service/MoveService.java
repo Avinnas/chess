@@ -1,7 +1,7 @@
 package com.example.chess.service;
 
-import com.example.chess.model.game.Move;
-import com.example.chess.model.game.MoveRepository;
+import com.example.chess.model.dto.MoveDto;
+import com.example.chess.model.game.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +21,10 @@ public class MoveService {
 
     public void flushRepository(){
         moveRepository.flush();
+    }
+
+    public Move castToProperClass(MoveDto moveDto, Board board){
+        return MoveFactory.getMove(moveDto, board);
     }
 
     public Move getLastAIMoveFromGame(int gameId){

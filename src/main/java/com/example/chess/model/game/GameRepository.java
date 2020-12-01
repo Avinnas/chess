@@ -11,4 +11,5 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
 
     public Optional<Game> findTopByUserIdAndFinishedIsFalseOrderByIdDesc(int id );
     public Optional<List<Game>> findAllByUserIdAndFinishedIsTrue(int userId);
+    public Optional<List<Game>> findAllByUserId(int userId);
 }

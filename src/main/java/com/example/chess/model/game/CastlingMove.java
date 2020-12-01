@@ -1,31 +1,49 @@
 package com.example.chess.model.game;
 
+import com.example.chess.model.dto.MoveDto;
+
+import javax.persistence.Entity;
+import javax.persistence.Transient;
+
+@Entity
 public class CastlingMove extends Move {
-    boolean isLongCastle;
+
+    @Transient
     int rookStartTile;
+    @Transient
     int rookDestinationTile;
 
-    public CastlingMove(boolean isLongCastle) {
-        this.isLongCastle = isLongCastle;
+    public CastlingMove(MoveDto move){
+        super(move);
+        calculateRookPosition(isLongCastle());
+
     }
 
-    public void calculateRookPosition(boolean isLongCastle){
-        this.isLongCastle = isLongCastle;
-        int distance = isLongCastle ? 2 : 1;
+    public CastlingMove() {
+
+    }
+
+    public boolean isLongCastle(){
+        return destinationTile == 58 || destinationTile == 2;
+    }
+    public void calculateRookPosition(boolean longCastle){
+        int distance = longCastle ? 2 : 1;
         int direction = (destinationTile - startTile)/2;
 
         this.rookStartTile = destinationTile + direction * distance;
         this.rookDestinationTile = destinationTile - direction;
     }
 
-
-    public boolean isLongCastle() {
-        return isLongCastle;
+    @Override
+    public void calculateHash(Board board){
+        if(isLongCastle()){
+            setHash("O-O-O");
+        }
+        else{
+            setHash("O-O");
+        }
     }
 
-    public void setLongCastle(boolean longCastle) {
-        isLongCastle = longCastle;
-    }
 
     public int getRookStartTile() {
         return rookStartTile;

@@ -15,6 +15,11 @@ public class King extends Piece{
         super(tileNumber, color);
     }
 
+    public List<Integer> findCastlingMoves(Board board){
+
+        return new ArrayList<>();
+    }
+
     @Override
     public List<Integer> findPossibleMoves(Board board) {
         List <Integer> relativePossibleMoves = new LinkedList<>(Arrays.asList(-7, -8, -9, -1, 1, 7, 8,9));

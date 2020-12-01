@@ -1,16 +1,14 @@
 package com.example.chess.model.game;
 
+import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.pieces.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Board {
     HashMap<Integer, Piece> tilePieceAssignment;
-    // # 0 - white,
-    List<Map<String, List<Piece>>> piecesByType;
 
 
     public Board() {
@@ -52,7 +50,7 @@ public class Board {
         tilePieceAssignment.put(62, new Knight(62, Color.WHITE));
         tilePieceAssignment.put(63, new Rook(63, Color.WHITE));
 
-        fillPiecesByType();
+
 
     }
 
@@ -62,152 +60,91 @@ public class Board {
             tilePieceAssignment.put(piece.getTileNumber(), piece);
         }
 
-        fillPiecesByType();
+
     }
 
     public Board(Board board) {
         tilePieceAssignment = new HashMap<>(board.getTilePieceAssignment());
 
-        Map<String, List<Piece>> whitePieces = new HashMap<>();
-        for (String key : board.getPlayerPieces(Color.WHITE).keySet()) {
-            whitePieces.put(key, new ArrayList<>(board.getPlayerPieces(Color.WHITE).get(key)));
-        }
-        Map<String, List<Piece>> blackPieces = new HashMap<>();
-        for (String key : board.getPlayerPieces(Color.BLACK).keySet()) {
-            blackPieces.put(key, new ArrayList<>(board.getPlayerPieces(Color.BLACK).get(key)));
-        }
-        piecesByType = new ArrayList<>();
-        piecesByType.add(whitePieces);
-        piecesByType.add(blackPieces);
-    }
-
-    private void fillPiecesByType() {
-        HashMap<String, List<Piece>> whitePiecesByType = new HashMap<>();
-        HashMap<String, List<Piece>> blackPiecesByType = new HashMap<>();
-
-        for (Piece piece : tilePieceAssignment.values()) {
-            String pieceClass = piece.getClass().getSimpleName();
-            if (piece.getColor() == Color.WHITE) {
-                var existingPieces = whitePiecesByType.get(pieceClass);
-                if (existingPieces != null) {
-                    existingPieces.add(piece);
-                    whitePiecesByType.put(pieceClass, existingPieces);
-                } else {
-                    var temp = new ArrayList<Piece>();
-                    temp.add(piece);
-                    whitePiecesByType.put(pieceClass, temp);
-                }
-            } else {
-                var existingPieces = blackPiecesByType.get(pieceClass);
-                if (existingPieces != null) {
-                    existingPieces.add(piece);
-                    blackPiecesByType.put(pieceClass, existingPieces);
-                } else {
-                    var temp = new ArrayList<Piece>();
-                    temp.add(piece);
-                    blackPiecesByType.put(pieceClass, temp);
-                }
-            }
-        }
-        piecesByType = new ArrayList<>();
-
-        piecesByType.add(whitePiecesByType);
-        piecesByType.add(blackPiecesByType);
     }
 
     public HashMap<Integer, List<Integer>> findCurrentPlayerMoves(Color currentColor) {
         HashMap<Integer, List<Integer>> possibleMoves = new HashMap<>();
-        for (List<Piece> piecesTypeList : piecesByType.get(currentColor.getValue()).values()) {
-            for (Piece piece : piecesTypeList) {
-
+        for (Piece piece : tilePieceAssignment.values()) {
+            if (piece.getColor() == currentColor) {
                 List<Integer> tiles = piece.findPossibleMoves(this);
                 if (!tiles.isEmpty()) {
                     possibleMoves.put(piece.getTileNumber(), tiles);
                 }
-
             }
+
         }
 
         return possibleMoves;
     }
 
-    public void removePieceAfterCapturing(Piece pieceToRemove) {
 
-        piecesByType
-                .get(pieceToRemove.getColor().getValue())
-                .get(pieceToRemove.getName())
-                .remove(pieceToRemove);
+    public void makeMove(MoveDto moveToMake) {
+        makeMove(MoveFactory.getMove(moveToMake, this));
+    }
+
+    public void makeCastlingMove(CastlingMove moveToMake) {
+        makeDefaultMove(moveToMake);
+        makeMove(new Move(moveToMake.getRookStartTile(), moveToMake.getRookDestinationTile()));
+    }
+
+    public void makePromotionMove(PromotionMove moveToMake) {
+        makeDefaultMove(moveToMake);
+        Piece p = tilePieceAssignment.remove(moveToMake.getDestinationTile());
+        tilePieceAssignment.put(p.getTileNumber(), new Queen(p.getTileNumber(), p.getColor()));
 
     }
 
-    public String calculateHash(Move move, boolean isCapture) {
-        String hash = "";
-        Piece piece = this.tilePieceAssignment.get(move.getStartTile());
-        if (!piece.getName().equals("Pawn")) {
-            if (piece.getName().equals("Knight")) {
-                hash += 'N';
-            } else {
-                hash += piece.getName().charAt(0);
-            }
-        }
 
+    public void makeMove(Move moveToMake) {
+        if (moveToMake.getClass().getSimpleName().equals("CastlingMove"))
+            makeCastlingMove((CastlingMove) moveToMake);
+        else if (moveToMake.getClass().getSimpleName().equals("PromotionMove"))
+            makePromotionMove((PromotionMove) moveToMake);
+        else
+            makeDefaultMove(moveToMake);
 
-        if (isCapture) {
-            hash += 'x';
-        }
-        hash += tileHash(move.getDestinationTile());
-        return hash;
     }
 
-    public String tileHash(int tileId) {
-        int row = 8 - (tileId / 8);
-        String column = String.valueOf((char) ((tileId % 8) + 97));
+    public void makeDefaultMove(Move moveToMake) {
+        int destinationTileId = moveToMake.getDestinationTile();
+        int actualTileId = moveToMake.getStartTile();
 
-        return column + row;
-    }
-
-    public Move makeMove(int actualTileId, int destinationTileId) {
-
-        Move moveMade = new Move(actualTileId, destinationTileId);
-
-        if (tilePieceAssignment.containsKey(destinationTileId)) {
-            removePieceAfterCapturing(tilePieceAssignment.get(destinationTileId));
-            moveMade.setHash(calculateHash(moveMade, true));
-        } else {
-            moveMade.setHash(calculateHash(moveMade, false));
-        }
         Piece piece = tilePieceAssignment.remove(actualTileId);
-        List<Piece> pieceList = getPiecesOfColor(piece.getColor()).get(piece.getName());
-        pieceList.remove(piece);
 
         Piece clonedPiece = piece.clone();
         clonedPiece.setTileNumber(destinationTileId);
 
-        pieceList.add(clonedPiece);
         tilePieceAssignment.put(destinationTileId, clonedPiece);
-
-        return moveMade;
     }
 
-    public Map<String, List<Piece>> getPiecesOfColor(Color color) {
-        return piecesByType.get(color.getValue());
-    }
-
-    public Move makeMove(Move moveToMake) {
-        return makeMove(moveToMake.getStartTile(), moveToMake.getDestinationTile());
+    public void calculateState(List<Move> moves) {
+        moves.forEach(this::makeMove);
     }
 
     public HashMap<Integer, Piece> getTilePieceAssignment() {
         return tilePieceAssignment;
     }
 
-    public Map<String, List<Piece>> getPlayerPieces(Color color) {
-        return piecesByType.get(color.getValue());
+    public Piece getPiece(int tileNumber) {
+        return tilePieceAssignment.get(tileNumber);
     }
 
-    public List<Map<String, List<Piece>>> getPiecesByType() {
-        return piecesByType;
+    public void removePiece(int tileNumber) {
+        Piece p = tilePieceAssignment.remove(tileNumber);
     }
+
+    public List<Piece> getPlayerPieces(Color color) {
+        return tilePieceAssignment.values().stream()
+                .filter(x -> x.getColor()==color)
+                .collect(Collectors.toList());
+    }
+
 
     public boolean tileIsEmpty(int tileNumber) {
         return !tilePieceAssignment.containsKey(tileNumber);
@@ -218,7 +155,4 @@ public class Board {
     }
 
 
-    public void calculateState(List<Move> moves) {
-        moves.forEach(this::makeMove);
-    }
 }

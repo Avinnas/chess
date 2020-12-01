@@ -33,7 +33,7 @@ public class Game {
     Date dateFinished;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "game",  cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "game",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Move> movesPlayed = new ArrayList<>();
 
     public Game() {
@@ -58,7 +58,7 @@ public class Game {
         return board.findCurrentPlayerMoves(currentPlayer);
     }
 
-    public Map<String, List<Piece>> getPlayerPieces() {
+    public  List<Piece> getPlayerPieces() {
         return board.getPlayerPieces(humanPlayerColor);
     }
 
@@ -69,17 +69,27 @@ public class Game {
 //    }
 
 
-    public Move makePlayerMove(Move moveToMake) {
+    public Move makeMove(Move moveToMake) {
 
-        moveToMake = board.makeMove(moveToMake);
-//        movesPlayed.add(moveToMake);
+        board.makeMove(moveToMake);
         checkIfFinished();
         currentPlayer = currentPlayer.getOpponentColor();
         return moveToMake;
 
     }
+// MOVES ADDED IN 2 METHODS SEPARATELY
+//    public Move makeAIMove() {
+//
+//        Move toMake = AlgorithmAI.minmax(board, 4, false).getSecond();
+//        toMake = board.makeMove(toMake);
+//
+//        checkIfFinished();
+//        currentPlayer = currentPlayer.getOpponentColor();
+//        return toMake;
+//
+//    }
     public boolean checkIfFinished(){
-        if(getBoardState().get(35) !=null){
+        if(getBoardState().get(63) !=null && getBoardState().get(63).getName().equals("King")){
             dateFinished = new Date();
             finished = true;
             wonByColor = currentPlayer;
@@ -87,24 +97,7 @@ public class Game {
         return finished;
     }
 
-    public Move makeAIMove() {
 
-//        var moves = getPossibleCurrentPlayerMoves();
-//        Random generator = new Random();
-//        var keys = moves.keySet().toArray();
-//        int randomKey = (int) keys[generator.nextInt(keys.length)];
-//
-//        List<Integer> pieceMoveList = moves.get(randomKey);
-//        int randomValue = pieceMoveList.get(generator.nextInt(pieceMoveList.size()));
-
-        Move toMake = AlgorithmAI.minmax(board, 4, false).getSecond();
-        toMake = board.makeMove(toMake);
-
-        checkIfFinished();
-        currentPlayer = currentPlayer.getOpponentColor();
-        return toMake;
-
-    }
     public void castMoveTypes(){
         for(int i=0; i< movesPlayed.size(); i++){
             Move move = movesPlayed.get(i);

@@ -59,7 +59,7 @@ public abstract class Piece implements Cloneable{
         int tileSearchedColumn = tileSearched % 8;
         List<Integer> possibleMoves = new ArrayList<>();
 
-        while (tileSearched >=0 && tileSearched <=63 && (tileSearchedColumn!=0 || y <0) && (tileSearchedColumn!=7 || y>0)){
+        while (tileSearched >=0 && tileSearched <=63 && (tileSearchedColumn!=0 || y !=1) && (tileSearchedColumn!=7 || y!=-1)){
             if(board.tileIsOccupiedByOpponent(tileSearched, color)){
                 possibleMoves.add(tileSearched);
                 break;
