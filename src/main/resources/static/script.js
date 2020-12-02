@@ -1,5 +1,5 @@
 /*<![CDATA[*/
-function drawBoard(x, y, color) {
+function drawBoard(x, y) {
     var chessBoard = document.getElementById("chessBoard");
     for (var i = 0; i < 64; i++) {
         var tile = document.createElement('div');
@@ -8,11 +8,11 @@ function drawBoard(x, y, color) {
 
         if (Math.floor((i / 8)) % 2 === 0) {
             if (i % 2 === 0) {
-                tile.style.backgroundColor = color;
+                tile.classList.add("black");
             }
         } else {
             if (i % 2 === 1) {
-                tile.style.backgroundColor = color;
+                tile.classList.add("black");
             }
         }
 
@@ -21,14 +21,15 @@ function drawBoard(x, y, color) {
 }
 
 function drawPieces(tiles) {
+    removeAllImages();
     for (const tileId in tiles) {
         let element = document.getElementById("tile-" + tileId)
+        element.innerHTML = ''
         let imageName = ''
-        if(tiles[tileId].color === "BLACK"){
-            imageName =  '/assets/' + tiles[tileId].name + 'b' + '.png'
-        }
-        else{
-            imageName =  '/assets/' + tiles[tileId].name + '.png'
+        if (tiles[tileId].color === "BLACK") {
+            imageName = '/assets/' + tiles[tileId].name + 'b' + '.png'
+        } else {
+            imageName = '/assets/' + tiles[tileId].name + '.png'
         }
         const image = document.createElement("img")
         element.appendChild(image);
@@ -73,20 +74,55 @@ function recreateAll() {
     }
 }
 
+function removeAllImages() {
+    for (let i = 0; i < 64; i++) {
+        let element = document.getElementById("tile-" + i);
+        element.innerHTML = ''
+    }
+}
+
+function markLastMove(startId, destinationId) {
+    let previousMove = document.getElementsByClassName("lastMoveStart");
+    if(previousMove.length>0){
+        previousMove[0].classList.remove("lastMoveStart")
+    }
+
+    previousMove = document.getElementsByClassName("lastMoveEnd");
+    if(previousMove.length>0) {
+        previousMove[0].classList.remove("lastMoveEnd")
+    }
+
+
+    let element = document.getElementById("tile-"+ startId);
+    console.log(startId);
+    console.log(destinationId);
+    element.classList.add("lastMoveStart");
+    let element2 = document.getElementById("tile-"+ destinationId);
+    element2.classList.add("lastMoveEnd");
+
+}
+
 async function handleMove(pieceId, destinationId) {
     handleReset()
     recreateAll()
     addResetEvent();
-    movePieceAtInterface(pieceId, destinationId)
 
     await sendMove(pieceId, destinationId);
-    if(await checkFinished()){
+    drawPieces(await getCurrentState())
+    markLastMove(pieceId, destinationId);
+
+    if (await checkFinished()) {
         document.getElementById("result").innerText = "GAME FINISHED"
         return false;
     }
+
+    const move = await makeAIMove();
+    console.log(move)
+    drawPieces(await getCurrentState())
+    markLastMove(move.startTile, move.destinationTile);
+
     await addMoveEventToPieces();
-    await makeAIMove();
-    if(await checkFinished()){
+    if (await checkFinished()) {
         document.getElementById("result").innerText = "GAME FINISHED"
         return false;
     }
@@ -96,19 +132,17 @@ async function handleMove(pieceId, destinationId) {
 
 }
 
-async function makeAIMove(){
-    let move = await getLastAIMove()
-    console.log(move)
-    movePieceAtInterface(move.startTile, move.destinationTile)
+async function makeAIMove() {
+    return await getLastAIMove()
 
 }
 
-async function getLastAIMove(){
-    var lastMove
+async function getLastAIMove() {
+    let lastMove;
 
     await $.ajax({
         url: "/game/last_move",
-        success: function (data){
+        success: function (data) {
             lastMove = data;
         }
     })

@@ -27,7 +27,7 @@
 
 <script th:inline="javascript">
     $(document).ready(async function () {
-        drawBoard(8, 8, "#af875f")
+        drawBoard(8, 8)
         drawPieces(await getCurrentState())
         addResetEvent();
         await addMoveEventToPieces()

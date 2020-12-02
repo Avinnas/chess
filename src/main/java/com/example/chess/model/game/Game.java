@@ -53,7 +53,10 @@ public class Game {
         return board.getTilePieceAssignment();
     }
 
-    public HashMap<Integer, List<Integer>> getPossibleCurrentPlayerMoves() {
+    public HashMap<Integer, HashSet<Integer>> getPossibleCurrentPlayerMoves() {
+        if(currentPlayer != humanPlayerColor){
+            throw new IllegalStateException();
+        }
 
         return board.findCurrentPlayerMoves(currentPlayer);
     }
@@ -62,11 +65,6 @@ public class Game {
         return board.getPlayerPieces(humanPlayerColor);
     }
 
-
-//    public Move showLastAIMove() {
-//
-//        return movesPlayed.get(movesPlayed.size() - 1);
-//    }
 
 
     public Move makeMove(Move moveToMake) {
@@ -89,11 +87,12 @@ public class Game {
 //
 //    }
     public boolean checkIfFinished(){
-        if(getBoardState().get(63) !=null && getBoardState().get(63).getName().equals("King")){
-            dateFinished = new Date();
-            finished = true;
-            wonByColor = currentPlayer;
-        }
+//        if(getBoardState().get(35)!=null){
+////        if(getBoardState().get(63) !=null && getBoardState().get(63).getName().equals("King")){
+//            dateFinished = new Date();
+//            finished = true;
+//            wonByColor = currentPlayer;
+//        }
         return finished;
     }
 

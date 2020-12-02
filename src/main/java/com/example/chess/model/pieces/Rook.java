@@ -4,8 +4,7 @@ import com.example.chess.model.game.Board;
 import com.example.chess.model.game.Color;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 @JsonTypeName("Rook")
 public class Rook extends Piece {
@@ -14,15 +13,20 @@ public class Rook extends Piece {
     }
 
     @Override
-    public List<Integer> findPossibleMoves(Board board) {
-        List<Integer> possibleMoves = new ArrayList<>();
+    public HashSet<Integer> findPossibleMoves(Board board) {
+        return  findPossibleMoves(board, false);
+    }
+    public HashSet<Integer> findPossibleMoves(Board board, boolean includeControlledTiles){
+        HashSet<Integer> possibleMoves = new HashSet<>();
 
-        possibleMoves.addAll(this.searchForMovesInDirection(1,0, board));
-        possibleMoves.addAll(this.searchForMovesInDirection(-1,0, board));
-        possibleMoves.addAll(this.searchForMovesInDirection(0,1, board));
-        possibleMoves.addAll(this.searchForMovesInDirection(0,-1, board));
+        possibleMoves.addAll(this.searchForMovesInDirection(-1,0, board, includeControlledTiles));
+        possibleMoves.addAll(this.searchForMovesInDirection(0,-1, board, includeControlledTiles));
+        possibleMoves.addAll(this.searchForMovesInDirection(0,1, board, includeControlledTiles));
+        possibleMoves.addAll(this.searchForMovesInDirection(1,0, board, includeControlledTiles));
+
 
         return possibleMoves;
     }
+
 
 }

@@ -2,6 +2,8 @@ package com.example.chess;
 
 import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.game.*;
+import com.example.chess.model.pieces.King;
+import com.example.chess.model.pieces.Pawn;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -44,11 +46,37 @@ class ChessApplicationTests {
 
 
 	}
+
+	@Test
+	void controlledTilesTest() {
+		Board board = new Board();
+		System.out.println(board.findTilesControlled(Color.BLACK));
+
+
+	}
+
 	@Test
 	void minmaxTest(){
 		Board board = new Board();
 
-		System.out.println(AlgorithmAI.minmax(board,7, true));
+		System.out.println(AlgorithmAI.minmax(board,6, true));
+	}
+
+	@Test
+	void positionalValueTest(){
+
+		System.out.println(AlgorithmAI.getMirrorTile(50));
+		System.out.println(AlgorithmAI.getMirrorTile(2));
+		System.out.println(AlgorithmAI.getMirrorTile(63));
+		System.out.println(AlgorithmAI.getMirrorTile(0));
+		System.out.println(AlgorithmAI.getMirrorTile(25));
+		System.out.println(AlgorithmAI.getMirrorTile(35));
+
+
+		System.out.println(AlgorithmAI.getPositionalValue(new Pawn(35,Color.WHITE)));
+
+		System.out.println(AlgorithmAI.getPositionalValue(new King(63,Color.BLACK)));
+		System.out.println(AlgorithmAI.getPositionalValue(new King(63,Color.WHITE)));
 	}
 
 

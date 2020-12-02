@@ -4,14 +4,25 @@ import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.pieces.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Board {
+
     HashMap<Integer, Piece> tilePieceAssignment;
+    boolean[] castlingRights;
 
 
     public Board() {
+
+        // Castling
+        // 0 - whiteShort
+        // 1 - whiteLong
+        // 2 - blackShort
+        // 3 - blackLong
+        castlingRights = new boolean[]{true, true, true, true};
+
         tilePieceAssignment = new HashMap<>();
 
         tilePieceAssignment.put(0, new Rook(0, Color.BLACK));
@@ -51,7 +62,6 @@ public class Board {
         tilePieceAssignment.put(63, new Rook(63, Color.WHITE));
 
 
-
     }
 
     public Board(Piece[] pieces) {
@@ -59,28 +69,35 @@ public class Board {
         for (Piece piece : pieces) {
             tilePieceAssignment.put(piece.getTileNumber(), piece);
         }
-
-
     }
 
     public Board(Board board) {
         tilePieceAssignment = new HashMap<>(board.getTilePieceAssignment());
-
+        castlingRights = board.getCastlingRights().clone();
     }
 
-    public HashMap<Integer, List<Integer>> findCurrentPlayerMoves(Color currentColor) {
-        HashMap<Integer, List<Integer>> possibleMoves = new HashMap<>();
-        for (Piece piece : tilePieceAssignment.values()) {
-            if (piece.getColor() == currentColor) {
-                List<Integer> tiles = piece.findPossibleMoves(this);
-                if (!tiles.isEmpty()) {
-                    possibleMoves.put(piece.getTileNumber(), tiles);
-                }
+    public HashMap<Integer, HashSet<Integer>> findCurrentPlayerMoves(Color currentColor) {
+        HashMap<Integer, HashSet<Integer>> possibleMoves = new HashMap<>();
+        for (Piece piece : getPlayerPieces(currentColor)) {
+            HashSet<Integer> tiles = piece.findPossibleMoves(this);
+            if (!tiles.isEmpty()) {
+                possibleMoves.put(piece.getTileNumber(), tiles);
             }
-
         }
 
         return possibleMoves;
+    }
+
+    public HashMap<Integer, HashSet<Integer>> findTilesControlled(Color currentColor) {
+        HashMap<Integer,HashSet<Integer>> controlledTiles = new HashMap<>();
+
+        for (Piece piece : getPlayerPieces(currentColor)) {
+            HashSet<Integer> tiles = piece.findPossibleMoves(this, true);
+            if (!tiles.isEmpty()) {
+                controlledTiles.put(piece.getTileNumber(), tiles);
+            }
+        }
+        return controlledTiles;
     }
 
 
@@ -102,16 +119,22 @@ public class Board {
 
 
     public void makeMove(Move moveToMake) {
-        if (moveToMake.getClass().getSimpleName().equals("CastlingMove"))
-            makeCastlingMove((CastlingMove) moveToMake);
-        else if (moveToMake.getClass().getSimpleName().equals("PromotionMove"))
-            makePromotionMove((PromotionMove) moveToMake);
-        else
-            makeDefaultMove(moveToMake);
-
+        switch(moveToMake.getClass().getSimpleName()) {
+            case "CastlingMove":
+                makeCastlingMove((CastlingMove) moveToMake);
+                break;
+            case "PromotionMove":
+                makePromotionMove((PromotionMove) moveToMake);
+                break;
+            default:
+                makeDefaultMove(moveToMake);
+        }
     }
 
     public void makeDefaultMove(Move moveToMake) {
+
+        checkCastlingRights(moveToMake);
+
         int destinationTileId = moveToMake.getDestinationTile();
         int actualTileId = moveToMake.getStartTile();
 
@@ -121,6 +144,19 @@ public class Board {
         clonedPiece.setTileNumber(destinationTileId);
 
         tilePieceAssignment.put(destinationTileId, clonedPiece);
+    }
+    public void checkCastlingRights(Move moveToMake){
+        Piece p = getPiece(moveToMake.getStartTile());
+        if(p.getName().equals("King")){
+            disallowCastling(p.getColor());
+        }
+        if(p.getName().equals("Rook")){
+            if(moveToMake.getStartTile() == 0 || moveToMake.getStartTile() == 56)
+                disallowLongCastling(p.getColor());
+
+            if(moveToMake.getStartTile() == 7 || moveToMake.getStartTile() == 63)
+                disallowShortCastling(p.getColor());
+        }
     }
 
     public void calculateState(List<Move> moves) {
@@ -141,7 +177,7 @@ public class Board {
 
     public List<Piece> getPlayerPieces(Color color) {
         return tilePieceAssignment.values().stream()
-                .filter(x -> x.getColor()==color)
+                .filter(x -> x.getColor() == color)
                 .collect(Collectors.toList());
     }
 
@@ -154,5 +190,61 @@ public class Board {
         return !tileIsEmpty(tileNumber) && tilePieceAssignment.get(tileNumber).getColor() != pieceColor;
     }
 
+    public boolean[] getCastlingRights() {
+        return castlingRights;
+    }
 
+    public boolean shortCastlingAllowed(Color color) {
+        return Color.WHITE == color ? castlingRights[0] : castlingRights[2];
+    }
+
+    public boolean longCastlingAllowed(Color color) {
+        return Color.WHITE == color ? castlingRights[1] : castlingRights[3];
+    }
+
+    public void disallowCastling(Color color) {
+        if (Color.WHITE == color) {
+            castlingRights[0] = false;
+            castlingRights[1] = false;
+        } else {
+            castlingRights[2] = false;
+            castlingRights[3] = false;
+        }
+
+    }
+
+    public void disallowLongCastling(Color color) {
+        if (Color.WHITE == color) {
+            castlingRights[1] = false;
+        } else {
+            castlingRights[3] = false;
+        }
+    }
+
+    public void disallowShortCastling(Color color) {
+        if (Color.WHITE == color) {
+            castlingRights[0] = false;
+        } else {
+            castlingRights[2] = false;
+        }
+    }
+    public HashSet<Integer> findCheckingPieces(int kingTile, Color kingColor){
+        HashSet<Integer> checkingPieces = new HashSet<>();
+        var tilesControlled = findTilesControlled(kingColor.getOpponentColor());
+        for(Integer pieceTile: tilesControlled.keySet()){
+            if(tilesControlled.get(pieceTile).contains(kingTile)){
+                checkingPieces.add(pieceTile);
+            }
+
+        }
+        return checkingPieces;
+    }
+
+    public int getKingTile(Color color){
+        for(Piece piece: tilePieceAssignment.values()){
+            if(piece.getName().equals("King") && piece.getColor() == color)
+                return piece.getTileNumber();
+        }
+        throw new IllegalStateException("No king on board");
+    }
 }

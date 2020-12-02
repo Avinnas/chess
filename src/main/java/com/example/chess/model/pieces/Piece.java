@@ -5,6 +5,7 @@ import com.example.chess.model.game.Board;
 import com.example.chess.model.game.Color;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public abstract class Piece implements Cloneable{
@@ -37,7 +38,7 @@ public abstract class Piece implements Cloneable{
 
     }
 
-    public abstract List<Integer> findPossibleMoves(Board board);
+    public abstract HashSet<Integer> findPossibleMoves(Board board);
 
     public int getTileNumber() {
         return tileNumber;
@@ -51,7 +52,7 @@ public abstract class Piece implements Cloneable{
         return color;
     }
 
-    public List<Integer> searchForMovesInDirection(int x, int y, Board board){
+    public List<Integer> searchForMovesInDirection(int x, int y, Board board, boolean includeControlled){
 
         if (x==0 && y==0) return new ArrayList<>();
 
@@ -60,7 +61,7 @@ public abstract class Piece implements Cloneable{
         List<Integer> possibleMoves = new ArrayList<>();
 
         while (tileSearched >=0 && tileSearched <=63 && (tileSearchedColumn!=0 || y !=1) && (tileSearchedColumn!=7 || y!=-1)){
-            if(board.tileIsOccupiedByOpponent(tileSearched, color)){
+            if(board.tileIsOccupiedByOpponent(tileSearched, color) || (!board.tileIsEmpty(tileSearched) && includeControlled)){
                 possibleMoves.add(tileSearched);
                 break;
             }
@@ -73,9 +74,10 @@ public abstract class Piece implements Cloneable{
         }
         return  possibleMoves;
     }
+    public abstract HashSet<Integer> findPossibleMoves(Board board, boolean includeControlledTiles);
 
-    public List<Integer> findControlledTiles(Board board){
-        return findPossibleMoves(board);
+    public HashSet<Integer> findControlledTiles(Board board){
+        return findPossibleMoves(board, true);
     }
 
     public String getName() {

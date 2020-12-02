@@ -6,6 +6,7 @@ import com.example.chess.model.pieces.Piece;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +41,9 @@ public class GameService {
     }
 
     public HashMap<Integer, Piece> getCurrentPlayerGameState() {
-        this.game = getOrCreateCurrentGame();
+        if(game == null){
+            this.game = getOrCreateCurrentGame();
+        }
 
         // TODO - obsługa przypadku, kiedy ostatni ruch był gracza i komputer musi go wykonać.
 
@@ -51,7 +54,7 @@ public class GameService {
         return game.getPlayerPieces();
     }
 
-    public HashMap<Integer, List<Integer>> getPossibleCurrentPlayerMoves() {
+    public HashMap<Integer, HashSet<Integer>> getPossibleCurrentPlayerMoves() {
         return game.getPossibleCurrentPlayerMoves();
     }
 
@@ -71,14 +74,10 @@ public class GameService {
 
         if(game.isFinished()){
             gameRepository.save(game);
-            return;
         }
 
-        makeAIMove();
-        gameRepository.save(game);
-
     }
-    public void makeAIMove(){
+    public Move makeAIMove(){
         MoveDto moveDto = AlgorithmAI.minmax(game.getBoard(), 5, false).getSecond();
         Move moveToMake = MoveFactory.getMove(moveDto, game.getBoard());
         moveToMake.setGame(game);
@@ -86,10 +85,15 @@ public class GameService {
         game.makeMove(moveToMake);
 
         gameRepository.save(game);
+
+        return moveToMake;
     }
 
-    public boolean checkIfFinished() {
-        return game.isFinished();
+    public boolean checkAndRemoveIfFinished() {
+        boolean finished = game.isFinished();
+        if(finished)
+            game=null;
+        return finished;
     }
 
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -45,7 +46,7 @@ public class GameController {
 
     @GetMapping("/player_moves")
     @ResponseBody
-    public HashMap<Integer, List<Integer>> showPlayerMoves() {
+    public HashMap<Integer, HashSet<Integer>> showPlayerMoves() {
         return gameService.getPossibleCurrentPlayerMoves();
     }
 
@@ -58,13 +59,13 @@ public class GameController {
     @GetMapping("/last_move")
     @ResponseBody
     public Move showLastMove(){
-        return gameService.getLastAIMove();
+        return gameService.makeAIMove();
     }
 
     @GetMapping("/finished")
     @ResponseBody
     public boolean checkIfFinished(){
-        return gameService.checkIfFinished();
+        return gameService.checkAndRemoveIfFinished();
     }
 
 
