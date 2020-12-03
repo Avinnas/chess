@@ -13,29 +13,30 @@ public class King extends Piece {
     }
 
     public HashSet<Integer> findCastlingMoves(Board board) {
-        HashSet<Integer> tilesControlled = new HashSet<>();
-//        HashSet<Integer> tilesControlled = board.findTilesControlled(color.getOpponentColor()).values()
-//                .stream()
-//                .reduce((x,y) -> {
-//                    x.addAll(y);
-//                    return x;
-//                }).orElseThrow();
 
         HashSet<Integer> moves = new HashSet<>();
+        if(!onStartTile()){
+            return moves;
+        }
+
         if (board.longCastlingAllowed(color)) {
-            if (board.tileIsEmpty(tileNumber - 1) && !tilesControlled.contains(tileNumber - 1) &&
-                    board.tileIsEmpty(tileNumber - 2) && !tilesControlled.contains(tileNumber - 2) &&
-                    board.tileIsEmpty(tileNumber - 3) && !tilesControlled.contains(tileNumber - 3)) {
+            if (board.tileIsEmpty(tileNumber - 1) &&
+                    board.tileIsEmpty(tileNumber - 2) &&
+                    board.tileIsEmpty(tileNumber - 3)) {
                 moves.add(tileNumber - 2);
             }
         }
         if (board.shortCastlingAllowed(color)) {
-            if (board.tileIsEmpty(tileNumber + 1) && !tilesControlled.contains(tileNumber + 1) &&
-                    board.tileIsEmpty(tileNumber + 2) && !tilesControlled.contains(tileNumber + 2)) {
+            if (board.tileIsEmpty(tileNumber + 1) &&
+                    board.tileIsEmpty(tileNumber + 2)) {
                 moves.add(tileNumber + 2);
             }
         }
         return moves;
+    }
+
+    private boolean onStartTile(){
+        return (tileNumber==60 && color ==Color.WHITE) || (tileNumber==4 && color ==Color.BLACK);
     }
 
     @Override

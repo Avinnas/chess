@@ -3,10 +3,10 @@ package com.example.chess.model.game;
 import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.pieces.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.lang.StrictMath.abs;
 
 public class Board {
 
@@ -65,6 +65,7 @@ public class Board {
     }
 
     public Board(Piece[] pieces) {
+        this();
         tilePieceAssignment = new HashMap<>();
         for (Piece piece : pieces) {
             tilePieceAssignment.put(piece.getTileNumber(), piece);
@@ -76,7 +77,7 @@ public class Board {
         castlingRights = board.getCastlingRights().clone();
     }
 
-    public HashMap<Integer, HashSet<Integer>> findCurrentPlayerMoves(Color currentColor) {
+    public HashMap<Integer, HashSet<Integer>> findPseudoLegalMoves(Color currentColor) {
         HashMap<Integer, HashSet<Integer>> possibleMoves = new HashMap<>();
         for (Piece piece : getPlayerPieces(currentColor)) {
             HashSet<Integer> tiles = piece.findPossibleMoves(this);
@@ -84,14 +85,184 @@ public class Board {
                 possibleMoves.put(piece.getTileNumber(), tiles);
             }
         }
-
         return possibleMoves;
     }
 
-    public HashMap<Integer, HashSet<Integer>> findTilesControlled(Color currentColor) {
-        HashMap<Integer,HashSet<Integer>> controlledTiles = new HashMap<>();
 
-        for (Piece piece : getPlayerPieces(currentColor)) {
+    public HashMap<Integer, HashSet<Integer>> findCurrentPlayerMoves(Color currentColor) {
+
+        var possibleMoves = findPseudoLegalMoves(currentColor);
+
+        int kingTile = getKingTile(currentColor);
+        if(kingTile ==-1){
+            System.out.println("No king on board");
+        }
+        var opponentPieces = getPlayerPieces(currentColor.getOpponentColor());
+        var tilesControlled = findTilesControlled(opponentPieces);
+        var checkingPieces = findCheckingPieces(getKingTile(currentColor), tilesControlled);
+        var pinnedMoves = findPinnedPiecesMoves(opponentPieces, kingTile);
+
+        excludeIllegalPinnedPiecesMoves(pinnedMoves, possibleMoves);
+        excludeIllegalKingMoves(possibleMoves, tilesControlled, kingTile);
+        possibleMoves = excludeIllegalMovesWhenChecked(possibleMoves, checkingPieces, kingTile);
+
+
+        return possibleMoves;
+    }
+    public void excludeIllegalKingMoves
+            (HashMap<Integer, HashSet<Integer>> possibleMoves, HashMap<Integer, HashSet<Integer>> tilesControlled, int kingTile){
+        HashSet<Integer> kingMoves = possibleMoves.get(kingTile);
+
+        if(kingMoves==null)
+            return;
+
+        HashSet<Integer> allControlled = tilesControlled.values()
+                .stream()
+                .reduce((x,y) -> {
+                    x.addAll(y);
+                    return x;
+                }).orElseThrow();
+
+        if(kingMoves.contains(kingTile-2)){
+            if(allControlled.contains(kingTile) || allControlled.contains(kingTile-1) || allControlled.contains(kingTile-2)){
+                kingMoves.remove(kingTile-2);
+            }
+        }
+        if(kingMoves.contains(kingTile+2)){
+            if(allControlled.contains(kingTile) || allControlled.contains(kingTile+1) || allControlled.contains(kingTile+2)){
+                kingMoves.remove(kingTile+2);
+            }
+        }
+        kingMoves.removeIf(allControlled::contains);
+    }
+
+    public HashMap<Integer, HashSet<Integer>> excludeIllegalMovesWhenChecked
+            (HashMap<Integer, HashSet<Integer>> possibleMoves, HashSet<Integer> checkingPieces, int kingTile){
+
+        if(checkingPieces.size() > 1){
+            possibleMoves = (HashMap<Integer, HashSet<Integer>>) Map.of(kingTile, possibleMoves.get(kingTile));
+        }
+
+        if (checkingPieces.size() == 1) {
+            var interruptingTiles = findInterruptingTiles(kingTile, checkingPieces.iterator().next());
+            HashMap<Integer, HashSet<Integer>> possibleMovesWhenChecked = new HashMap<>();
+
+            for(var entry: possibleMoves.entrySet()){
+                HashSet<Integer> movesForPiece = new HashSet<>();
+
+                for(int tile: entry.getValue()){
+                    if(interruptingTiles.contains(tile)){
+                        movesForPiece.add(tile);
+                    }
+                }
+                if(!movesForPiece.isEmpty()){
+                    possibleMovesWhenChecked.put(entry.getKey(), movesForPiece);
+                }
+            }
+            return possibleMovesWhenChecked;
+        }
+        return possibleMoves;
+
+    }
+
+
+    public void excludeIllegalPinnedPiecesMoves
+            (HashMap<Integer, HashSet<Integer>> pinnedMoves, HashMap<Integer, HashSet<Integer>> possibleMoves){
+
+        for(var entry: pinnedMoves.entrySet()){
+
+            if(possibleMoves.containsKey(entry.getKey())){
+                possibleMoves.get(entry.getKey()).removeIf( tile -> !entry.getValue().contains(tile));
+            }
+
+        }
+        possibleMoves.entrySet().removeIf(x -> x.getValue().isEmpty());
+    }
+
+    public HashMap<Integer, HashSet<Integer>> findPinnedPiecesMoves(List<Piece> opponentPieces, int kingTile) {
+        HashMap<Integer, HashSet<Integer>> allPossiblePinnedMoves= new HashMap<>();
+        for (Piece p : opponentPieces) {
+            if (p.getName().equals("Queen") || p.getName().equals("Bishop")) {
+                if (isOnSameDiagonal(p.getTileNumber(), kingTile)) {
+                    allPossiblePinnedMoves.putAll(findPinnedPieceMovesIfPinExists(p.getTileNumber(), kingTile, p.getColor()));
+                }
+            }
+            if (p.getName().equals("Queen") || p.getName().equals("Rook")) {
+                if (isOnSameLine(p.getTileNumber(), kingTile)) {
+                    allPossiblePinnedMoves.putAll(findPinnedPieceMovesIfPinExists(p.getTileNumber(), kingTile, p.getColor()));
+                }
+            }
+        }
+        return allPossiblePinnedMoves;
+    }
+
+    public HashMap<Integer, HashSet<Integer>>
+    findPinnedPieceMovesIfPinExists(int potentialPinningPiece, int kingTile, Color pinningPieceColor) {
+
+        int currentTile = potentialPinningPiece;
+        HashSet<Integer> pinnedPieceMoves = new HashSet<>();
+        int potentialPinnedPiece = 0;
+        HashMap<Integer, HashSet<Integer>> movesMap = new HashMap<>();
+
+        while (currentTile != kingTile) {
+            pinnedPieceMoves.add(currentTile);
+            currentTile = moveTowardsKing(currentTile, kingTile);
+            if (tileIsOccupiedByOpponent(currentTile, pinningPieceColor)){
+                if(potentialPinnedPiece!=0){
+                    if(currentTile==kingTile){
+                        movesMap.put(potentialPinnedPiece, pinnedPieceMoves);
+                    }
+                }
+                potentialPinnedPiece = currentTile;
+            }
+
+        }
+        return movesMap;
+    }
+
+    public int moveTowardsKing(int pieceTile, int kingTile) {
+        int xVector = (kingTile % 8) - (pieceTile % 8);
+        xVector = xVector != 0 ? xVector / abs(xVector) : xVector;
+        int yVector = (kingTile / 8) - (pieceTile / 8);
+        yVector = yVector != 0 ? yVector / abs(yVector) : yVector;
+
+        return pieceTile + xVector + yVector * 8;
+    }
+
+    public boolean isOnSameLine(int pieceTile, int kingTile) {
+
+        return (pieceTile % 8 == kingTile % 8) || (pieceTile / 8 == kingTile / 8);
+    }
+
+    public boolean isOnSameDiagonal(int pieceTile, int kingTile) {
+
+        return abs((pieceTile / 8) - (kingTile / 8)) == abs((pieceTile % 8) - (kingTile % 8));
+    }
+
+    public HashSet<Integer> findInterruptingTiles(int kingTile, int pieceTile) {
+        HashSet<Integer> interruptingTiles = new HashSet<Integer>();
+        if (getPiece(pieceTile).getName().equals("Knight")) {
+            interruptingTiles.add(pieceTile);
+            return interruptingTiles;
+        }
+
+        int currentTile = pieceTile;
+        while (currentTile != kingTile) {
+            interruptingTiles.add(currentTile);
+            currentTile = moveTowardsKing(currentTile, kingTile);
+
+
+            if (currentTile >= 64 || currentTile < 0) {
+                throw new IllegalStateException("find interrupting tile - tile is out of board" + kingTile + " " + pieceTile);
+            }
+        }
+        return interruptingTiles;
+    }
+
+    public HashMap<Integer, HashSet<Integer>> findTilesControlled(List<Piece> pieces) {
+        HashMap<Integer, HashSet<Integer>> controlledTiles = new HashMap<>();
+
+        for (Piece piece : pieces) {
             HashSet<Integer> tiles = piece.findPossibleMoves(this, true);
             if (!tiles.isEmpty()) {
                 controlledTiles.put(piece.getTileNumber(), tiles);
@@ -119,7 +290,7 @@ public class Board {
 
 
     public void makeMove(Move moveToMake) {
-        switch(moveToMake.getClass().getSimpleName()) {
+        switch (moveToMake.getClass().getSimpleName()) {
             case "CastlingMove":
                 makeCastlingMove((CastlingMove) moveToMake);
                 break;
@@ -145,16 +316,17 @@ public class Board {
 
         tilePieceAssignment.put(destinationTileId, clonedPiece);
     }
-    public void checkCastlingRights(Move moveToMake){
+
+    public void checkCastlingRights(Move moveToMake) {
         Piece p = getPiece(moveToMake.getStartTile());
-        if(p.getName().equals("King")){
+        if (p.getName().equals("King")) {
             disallowCastling(p.getColor());
         }
-        if(p.getName().equals("Rook")){
-            if(moveToMake.getStartTile() == 0 || moveToMake.getStartTile() == 56)
+        if (p.getName().equals("Rook")) {
+            if (moveToMake.getStartTile() == 0 || moveToMake.getStartTile() == 56)
                 disallowLongCastling(p.getColor());
 
-            if(moveToMake.getStartTile() == 7 || moveToMake.getStartTile() == 63)
+            if (moveToMake.getStartTile() == 7 || moveToMake.getStartTile() == 63)
                 disallowShortCastling(p.getColor());
         }
     }
@@ -228,11 +400,11 @@ public class Board {
             castlingRights[2] = false;
         }
     }
-    public HashSet<Integer> findCheckingPieces(int kingTile, Color kingColor){
+
+    public HashSet<Integer> findCheckingPieces(int kingTile, HashMap<Integer, HashSet<Integer>> tilesControlled) {
         HashSet<Integer> checkingPieces = new HashSet<>();
-        var tilesControlled = findTilesControlled(kingColor.getOpponentColor());
-        for(Integer pieceTile: tilesControlled.keySet()){
-            if(tilesControlled.get(pieceTile).contains(kingTile)){
+        for (Integer pieceTile : tilesControlled.keySet()) {
+            if (tilesControlled.get(pieceTile).contains(kingTile)) {
                 checkingPieces.add(pieceTile);
             }
 
@@ -240,11 +412,21 @@ public class Board {
         return checkingPieces;
     }
 
-    public int getKingTile(Color color){
-        for(Piece piece: tilePieceAssignment.values()){
-            if(piece.getName().equals("King") && piece.getColor() == color)
+    public boolean isCheck(Color color) {
+        return !findCheckingPieces(getKingTile(color), findTilesControlled(getPlayerPieces(color))).isEmpty();
+    }
+
+
+    public int getKingTile(Color color) {
+        for (Piece piece : tilePieceAssignment.values()) {
+            if (piece.getName().equals("King") && piece.getColor() == color)
                 return piece.getTileNumber();
         }
-        throw new IllegalStateException("No king on board");
+        return -1;
+    }
+
+    public void addPiece(Piece piece) {
+        tilePieceAssignment.put(piece.getTileNumber(), piece);
     }
 }
+

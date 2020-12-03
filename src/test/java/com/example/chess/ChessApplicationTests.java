@@ -4,6 +4,8 @@ import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.game.*;
 import com.example.chess.model.pieces.King;
 import com.example.chess.model.pieces.Pawn;
+import com.example.chess.model.pieces.Piece;
+import com.example.chess.model.pieces.Queen;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -19,13 +21,13 @@ class ChessApplicationTests {
 
 	@Test
 	void gameTest(){
-		Game game = new Game();
-		System.out.println(game.getBoardState());
-
-//		game.makePlayerMove(new Move(55,47));
-//		game.makeAIMove();
-
-		System.out.println(game.getBoardState());
+//		Game game = new Game();
+//		System.out.println(game.getBoardState());
+//
+////		game.makePlayerMove(new Move(55,47));
+////		game.makeAIMove();
+//
+//		System.out.println(game.getBoardState());
 	}
 
 
@@ -50,16 +52,46 @@ class ChessApplicationTests {
 	@Test
 	void controlledTilesTest() {
 		Board board = new Board();
-		System.out.println(board.findTilesControlled(Color.BLACK));
+//		System.out.println(board.findTilesControlled(Color.BLACK));
 
 
 	}
 
 	@Test
-	void minmaxTest(){
+	void pinTest() {
+		Piece[] pieces = new Piece[]{new Queen(8, Color.BLACK), new Queen(16, Color.WHITE), new King(56, Color.WHITE)};
+
+		Board board = new Board(pieces);
+
+		System.out.println(board.findCurrentPlayerMoves(Color.WHITE));
+
+		pieces = new Piece[]{new Queen(8, Color.BLACK), new Queen(20, Color.WHITE), new King(32, Color.WHITE)};
+		board = new Board(pieces);
+		System.out.println(board.findCurrentPlayerMoves(Color.WHITE));
+
+
+	}
+
+
+	@Test
+	void ChecksTest() {
 		Board board = new Board();
 
-		System.out.println(AlgorithmAI.minmax(board,6, true));
+		board.removePiece(52);
+		board.addPiece(new Queen(52, Color.BLACK));
+
+		System.out.println(board.findCurrentPlayerMoves(Color.WHITE));
+
+
+
+	}
+
+
+	@Test
+	void minmaxTest(){
+		Board board = new Board();
+//
+		System.out.println(AlgorithmAI.minmax(board,7, true));
 	}
 
 	@Test

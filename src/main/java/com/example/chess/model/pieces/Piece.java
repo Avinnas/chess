@@ -63,9 +63,10 @@ public abstract class Piece implements Cloneable{
         while (tileSearched >=0 && tileSearched <=63 && (tileSearchedColumn!=0 || y !=1) && (tileSearchedColumn!=7 || y!=-1)){
             if(board.tileIsOccupiedByOpponent(tileSearched, color) || (!board.tileIsEmpty(tileSearched) && includeControlled)){
                 possibleMoves.add(tileSearched);
-                break;
             }
-            if(!board.tileIsEmpty(tileSearched)) break;
+            if(!board.tileIsEmpty(tileSearched) &&
+                    !(includeControlled && board.getPiece(tileSearched).getName().equals("King")))
+                break;
 
             possibleMoves.add(tileSearched);
 

@@ -55,7 +55,7 @@ public class Game {
 
     public HashMap<Integer, HashSet<Integer>> getPossibleCurrentPlayerMoves() {
         if(currentPlayer != humanPlayerColor){
-            throw new IllegalStateException();
+            System.out.println(" RETURNED MOVES FOR AI ");
         }
 
         return board.findCurrentPlayerMoves(currentPlayer);
