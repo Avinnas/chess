@@ -18,6 +18,10 @@ public class PromotionMove extends Move{
         super(move);
         setPromotedClass(promotedClass);
     }
+    public PromotionMove(int startTile, int destinationTile, char promotedClass){
+        super(startTile, destinationTile);
+        setPromotedClass(promotedClass);
+    }
 
     public PromotionMove() {
 

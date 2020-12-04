@@ -90,8 +90,16 @@ class ChessApplicationTests {
 	@Test
 	void minmaxTest(){
 		Board board = new Board();
+		System.out.println(AlgorithmAI.minmax(board,5, true));
+	}
+
+	@Test
+	void movesTest(){
+		Board board = new Board();
+
+		var moves = board.findCurrentPlayerMoves(Color.WHITE);
+		System.out.println(AlgorithmAI.generateListOfMoves(moves, board));
 //
-		System.out.println(AlgorithmAI.minmax(board,7, true));
 	}
 
 	@Test

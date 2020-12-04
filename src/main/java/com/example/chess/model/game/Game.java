@@ -28,7 +28,7 @@ public class Game {
     Color currentPlayer;
 
     boolean finished;
-    Color wonByColor;
+    int gameResult;
 
     Date dateFinished;
 
@@ -75,25 +75,35 @@ public class Game {
         return moveToMake;
 
     }
-// MOVES ADDED IN 2 METHODS SEPARATELY
-//    public Move makeAIMove() {
-//
-//        Move toMake = AlgorithmAI.minmax(board, 4, false).getSecond();
-//        toMake = board.makeMove(toMake);
-//
-//        checkIfFinished();
-//        currentPlayer = currentPlayer.getOpponentColor();
-//        return toMake;
-//
-//    }
+
     public boolean checkIfFinished(){
-//        if(getBoardState().get(35)!=null){
-////        if(getBoardState().get(63) !=null && getBoardState().get(63).getName().equals("King")){
-//            dateFinished = new Date();
-//            finished = true;
-//            wonByColor = currentPlayer;
-//        }
-        return finished;
+        int res= board.checkResult(currentPlayer);
+        if(res!=0){
+            dateFinished = new Date();
+            finished = true;
+            gameResult=res;
+            return true;
+        }
+        if(positionRepetition()){
+            dateFinished = new Date();
+            finished = true;
+            gameResult=10;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean positionRepetition(){
+        if(movesPlayed.size() <8 )
+            return false;
+        int listSize = movesPlayed.size();
+        if(movesPlayed.get(listSize-1).equals(movesPlayed.get(listSize-5))
+                && movesPlayed.get(listSize-2).equals(movesPlayed.get(listSize-6))
+                && movesPlayed.get(listSize-3).equals(movesPlayed.get(listSize-7))
+                && movesPlayed.get(listSize-4).equals(movesPlayed.get(listSize-8))){
+            return true;
+        }
+        return false;
     }
 
 
@@ -189,12 +199,12 @@ public class Game {
         finished = finished;
     }
 
-    public Color getWonByColor() {
-        return wonByColor;
+    public int getGameResult() {
+        return gameResult;
     }
 
-    public void setWonByColor(Color wonByColor) {
-        this.wonByColor = wonByColor;
+    public void setGameResult(int gameResult) {
+        this.gameResult = gameResult;
     }
 
     public Date getDateFinished() {

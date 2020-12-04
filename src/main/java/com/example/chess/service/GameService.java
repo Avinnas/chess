@@ -40,12 +40,15 @@ public class GameService {
         }
     }
 
+    public void abandonAndCreateNewGame(){
+        game = new Game(userService.getCurrentPlayer());
+        gameRepository.save(game);
+    }
+
     public HashMap<Integer, Piece> getCurrentPlayerGameState() {
         if(game == null){
             this.game = getOrCreateCurrentGame();
         }
-
-        // TODO - obsługa przypadku, kiedy ostatni ruch był gracza i komputer musi go wykonać.
 
         return game.getBoardState();
     }
@@ -78,7 +81,7 @@ public class GameService {
 
     }
     public Move makeAIMove(){
-        MoveDto moveDto = AlgorithmAI.minmax(game.getBoard(), 5, false).getSecond();
+        Move moveDto = AlgorithmAI.minmax(game.getBoard(), 5, false).getSecond();
         Move moveToMake = MoveFactory.getMove(moveDto, game.getBoard());
         moveToMake.setGame(game);
         moveService.addMove(moveToMake);

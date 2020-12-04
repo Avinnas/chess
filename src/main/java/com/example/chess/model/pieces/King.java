@@ -18,20 +18,27 @@ public class King extends Piece {
         if(!onStartTile()){
             return moves;
         }
+        Piece p = board.getPiece(tileNumber-4);
+        if(p!=null){
+            if (board.longCastlingAllowed(color) &&  p.getName().equals("Rook") && p.getColor()==color) {
+                if (board.tileIsEmpty(tileNumber - 1) &&
+                        board.tileIsEmpty(tileNumber - 2) &&
+                        board.tileIsEmpty(tileNumber - 3)) {
+                    moves.add(tileNumber - 2);
+                }
+            }
+        }
 
-        if (board.longCastlingAllowed(color)) {
-            if (board.tileIsEmpty(tileNumber - 1) &&
-                    board.tileIsEmpty(tileNumber - 2) &&
-                    board.tileIsEmpty(tileNumber - 3)) {
-                moves.add(tileNumber - 2);
+        p = board.getPiece(tileNumber+3);
+        if(p!= null){
+            if (board.shortCastlingAllowed(color) && p.getName().equals("Rook") && p.getColor()==color) {
+                if (board.tileIsEmpty(tileNumber + 1) &&
+                        board.tileIsEmpty(tileNumber + 2)) {
+                    moves.add(tileNumber + 2);
+                }
             }
         }
-        if (board.shortCastlingAllowed(color)) {
-            if (board.tileIsEmpty(tileNumber + 1) &&
-                    board.tileIsEmpty(tileNumber + 2)) {
-                moves.add(tileNumber + 2);
-            }
-        }
+
         return moves;
     }
 

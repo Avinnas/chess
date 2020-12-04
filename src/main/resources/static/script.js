@@ -45,6 +45,14 @@ function handleReset() {
         elements[0].parentNode.addEventListener("click", handleReset);
         elements[0].parentNode.removeChild(elements[0]);
     }
+
+    // elements = document.getElementsByClassName("movingPiece")
+    //
+    // while (elements.length > 0) {
+    //     recreateElement(elements[0].parentNode);
+    //     elements[0].parentNode.addEventListener("click", handleReset);
+    //     elements[0].parentNode.removeChild(elements[0]);
+    // }
 }
 
 function handlePieceClick(id, pieceMoves) {
@@ -80,8 +88,7 @@ function removeAllImages() {
         element.innerHTML = ''
     }
 }
-
-function markLastMove(startId, destinationId) {
+function removeLastMoveMarkers(){
     let previousMove = document.getElementsByClassName("lastMoveStart");
     if(previousMove.length>0){
         previousMove[0].classList.remove("lastMoveStart")
@@ -92,10 +99,12 @@ function markLastMove(startId, destinationId) {
         previousMove[0].classList.remove("lastMoveEnd")
     }
 
+}
+
+function markLastMove(startId, destinationId) {
+    removeLastMoveMarkers();
 
     let element = document.getElementById("tile-"+ startId);
-    console.log(startId);
-    console.log(destinationId);
     element.classList.add("lastMoveStart");
     let element2 = document.getElementById("tile-"+ destinationId);
     element2.classList.add("lastMoveEnd");
@@ -108,6 +117,22 @@ async function handleMove(pieceId, destinationId) {
     addResetEvent();
 
     await sendMove(pieceId, destinationId);
+    if(await onEachMove(pieceId, destinationId)=== false) {
+        return false;
+    }
+    await addMoveEventToPieces();
+
+     // const move = await makeAIMove();
+     if(await onEachMove(move.startTile, move.destinationTile) === false){
+         return false;
+     }
+
+    await addMoveEventToPieces();
+
+
+}
+async function onEachMove(pieceId, destinationId){
+
     drawPieces(await getCurrentState())
     markLastMove(pieceId, destinationId);
 
@@ -115,20 +140,6 @@ async function handleMove(pieceId, destinationId) {
         document.getElementById("result").innerText = "GAME FINISHED"
         return false;
     }
-
-    const move = await makeAIMove();
-    console.log(move)
-    drawPieces(await getCurrentState())
-    markLastMove(move.startTile, move.destinationTile);
-
-    await addMoveEventToPieces();
-    if (await checkFinished()) {
-        document.getElementById("result").innerText = "GAME FINISHED"
-        return false;
-    }
-
-    // alert(" MOVE HANDLE " + pieceId + " -> " + destinationId);
-
 
 }
 
@@ -167,6 +178,29 @@ async function sendMove(pieceId, destinationId) {
     })
 
 }
+async function newGame(){
+    await sendNewGameRequest();
+    await refreshBoard();
+
+}
+
+async function refreshBoard(){
+    removeLastMoveMarkers();
+    drawPieces(await getCurrentState())
+    addResetEvent();
+    await addMoveEventToPieces()
+}
+
+async function sendNewGameRequest(){
+    await $.ajax({
+        type: "POST",
+        url: "/game/new",
+        success: function () {
+            alert("sending")
+        }
+    });
+
+}
 
 function movePieceAtInterface(pieceId, destinationId) {
     // alert(pieceId + " " + destinationId)
@@ -188,8 +222,10 @@ async function addMoveEventToPieces() {
     for (const tileId in moves) {
         let element = document.getElementById("tile-" + tileId)
         element = recreateElement(element);
-        console.log("Adding event " + tileId)
         element.addEventListener("click", () => handlePieceClick(tileId, moves[tileId]))
+        // let possibleMovingPiece = document.createElement("div");
+        // possibleMovingPiece.className = "movingPiece";
+        // element.appendChild(possibleMovingPiece);
     }
 }
 
@@ -211,7 +247,6 @@ async function getCurrentState() {
             url: "game/current_state",
             success: function (data) {
                 state = data
-                console.log(state)
             }
         }
     )

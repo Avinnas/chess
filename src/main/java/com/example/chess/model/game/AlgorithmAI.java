@@ -1,10 +1,9 @@
 package com.example.chess.model.game;
 
-import com.example.chess.model.dto.MoveDto;
 import com.example.chess.model.pieces.Piece;
 import org.springframework.data.util.Pair;
 
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
@@ -101,7 +100,34 @@ public class AlgorithmAI {
         return tile % 8 + 8 * (7 - row);
     }
 
+    public static List<Move> generateListOfMoves(HashMap<Integer, HashSet<Integer>> moveMap, Board board){
+        List<Move> captures = new ArrayList<>();
+        List<Move> nonCaptures = new ArrayList<>();
+        for(var entry: moveMap.entrySet()){
+            for(int destinationTile: entry.getValue()){
+                Move m = MoveFactory.getSimpleMove(entry.getKey(), destinationTile, board);
+                if(m.isCapture(board)){
+                    captures.add(m);
+                }
+                else {
+                    nonCaptures.add(m);
+                }
+            }
+        }
+        captures.addAll(nonCaptures);
+        return captures;
+    }
+
     public static int evaluateBoard(Board board) {
+        int result = board.getGameResult();
+        if(result == 10){
+            return 0;
+        } else if (result == 1){
+            return Integer.MAX_VALUE;
+        } else if (result == -1){
+            return Integer.MIN_VALUE;
+        }
+
         int sum = 0;
         for (Piece piece : board.getTilePieceAssignment().values()) {
             if (piece.getColor() == Color.WHITE) {
@@ -113,7 +139,7 @@ public class AlgorithmAI {
         return sum;
     }
 
-    public static Pair<Integer, MoveDto> minmax(Board board, int depth, boolean isWhitePlayerTurn) {
+    public static Pair<Integer, Move> minmax(Board board, int depth, boolean isWhitePlayerTurn) {
         if (isWhitePlayerTurn) {
             return maximize(board, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
         } else {
@@ -121,63 +147,65 @@ public class AlgorithmAI {
         }
     }
 
-    public static Pair<Integer, MoveDto> maximize(Board board, int depth, int alpha, int beta) {
+    public static Pair<Integer, Move> maximize(Board board, int depth, int alpha, int beta) {
         if (depth == 0) {
-            return Pair.of(evaluateBoard(board), new MoveDto());
+            return Pair.of(evaluateBoard(board), new Move());
         }
 
         int maxEval = Integer.MIN_VALUE;
-        MoveDto bestMove = new MoveDto();
-        var moves = board.findCurrentPlayerMoves(Color.WHITE);
-        for (int startTile : moves.keySet()) {
-            for (int destinationTile : moves.get(startTile)) {
+        Move bestMove = new Move();
+        var movesMap = board.findCurrentPlayerMoves(Color.WHITE);
 
-                Board boardCopy = new Board(board);
-                MoveDto m = new MoveDto(startTile, destinationTile);
-                boardCopy.makeMove(m);
+        if (board.getGameResult()!=0){
+            return Pair.of(evaluateBoard(board), new Move());
+        }
+        var moves = generateListOfMoves(movesMap,board);
 
-                int eval = minimize(boardCopy, depth - 1, alpha, beta).getFirst();
-                if (maxEval < eval) {
-                    maxEval = eval;
-                    bestMove = m;
-                }
-                alpha = max(alpha, eval);
-                if (beta <= alpha) {
-                    return Pair.of(maxEval, bestMove);
-                }
+        for(Move m: moves) {
+            Board boardCopy = new Board(board);
+            boardCopy.makeMove(m);
+
+            int eval = minimize(boardCopy, depth - 1, alpha, beta).getFirst();
+            if (maxEval < eval) {
+                maxEval = eval;
+                bestMove = m;
+            }
+            alpha = max(alpha, eval);
+            if (beta <= alpha) {
+                return Pair.of(maxEval, bestMove);
             }
         }
         return Pair.of(maxEval, bestMove);
     }
 
-    public static Pair<Integer, MoveDto> minimize(Board board, int depth, int alpha, int beta) {
+    public static Pair<Integer, Move> minimize(Board board, int depth, int alpha, int beta) {
         if (depth == 0) {
-            return Pair.of(evaluateBoard(board), new MoveDto());
+            return Pair.of(evaluateBoard(board), new Move());
         }
 
         int minEval = Integer.MAX_VALUE;
-        var moves = board.findCurrentPlayerMoves(Color.BLACK);
-        MoveDto bestMove = new MoveDto();
-        for (int startTile : moves.keySet()) {
-            for (int destinationTile : moves.get(startTile)) {
+        var movesMap = board.findCurrentPlayerMoves(Color.BLACK);
+        Move bestMove = new Move();
 
-                Board boardCopy = new Board(board);
-                MoveDto m = new MoveDto(startTile, destinationTile);
-                boardCopy.makeMove(m);
+        if (board.getGameResult()!=0){
+            return Pair.of(evaluateBoard(board), new Move());
+        }
 
-                int eval = maximize(boardCopy, depth - 1, alpha, beta).getFirst();
-                if (minEval > eval) {
-                    minEval = eval;
-                    bestMove = m;
-                }
-                beta = min(beta, eval);
-                if (beta <= alpha) {
-                    return Pair.of(minEval, bestMove);
-                }
+        var moves = generateListOfMoves(movesMap,board);
 
+        for(Move m: moves) {
+            Board boardCopy = new Board(board);
+            boardCopy.makeMove(m);
 
+            int eval = maximize(boardCopy, depth - 1, alpha, beta).getFirst();
+            if (minEval > eval) {
+                minEval = eval;
+                bestMove = m;
             }
-
+            beta = min(beta, eval);
+            if (beta <= alpha) {
+                return Pair.of(minEval, bestMove);
+            }
         }
         return Pair.of(minEval, bestMove);
     }

@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "moves")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Move{
+public class Move {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -49,6 +49,18 @@ public class Move{
     public Move(MoveDto move){
         this.startTile = move.getStartTile();
         this.destinationTile = move.getDestinationTile();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj == null)
+            return false;
+
+        Move move = (Move) obj;
+        return this.startTile == move.startTile
+                && this.destinationTile == move.destinationTile
+                && this.hash.equals(move.hash);
     }
 
     public boolean isCapture(Board board) {

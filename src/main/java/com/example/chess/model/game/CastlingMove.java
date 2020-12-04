@@ -16,7 +16,10 @@ public class CastlingMove extends Move {
     public CastlingMove(MoveDto move){
         super(move);
         calculateRookPosition(isLongCastle());
-
+    }
+    public CastlingMove(int startTile, int destinationTile){
+        super(startTile, destinationTile);
+        calculateRookPosition(isLongCastle());
     }
 
     public CastlingMove() {

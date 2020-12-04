@@ -68,6 +68,10 @@ public class GameController {
         return gameService.checkAndRemoveIfFinished();
     }
 
+    @PostMapping("/new")
+    @ResponseBody
+    public void newGame() {gameService.abandonAndCreateNewGame();}
+
 
 
 }
