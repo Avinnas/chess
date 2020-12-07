@@ -15,7 +15,7 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonBackReference
     User user;
@@ -33,7 +33,7 @@ public class Game {
     Date dateFinished;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "game",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     List<Move> movesPlayed = new ArrayList<>();
 
     public Game() {
@@ -46,11 +46,11 @@ public class Game {
         this();
         this.user = user;
     }
-    public Game(User user, String color){
+    public Game(User user, Color color) {
         this(user);
-        if(color.equals("BLACK"))
-            this.humanPlayerColor = Color.BLACK;
+        this.humanPlayerColor = Color.BLACK;
     }
+
 
 
     public HashMap<Integer, Piece> getBoardState() {

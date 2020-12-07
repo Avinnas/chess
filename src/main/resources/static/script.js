@@ -1,9 +1,11 @@
 /*<![CDATA[*/
-function drawBoard(x, y) {
+function drawBoard(x, y, playerColor) {
+    document.getElementById("chessBoard").innerHTML = ""
+    var isWhite = playerColor !== "BLACK";
     var chessBoard = document.getElementById("chessBoard");
     for (var i = 0; i < 64; i++) {
         var tile = document.createElement('div');
-        tile.id = "tile-" + i.toString();
+        tile.id = "tile-" + (isWhite ? i : 63-i).toString();
         tile.className = "tile"
 
         if (Math.floor((i / 8)) % 2 === 0) {
@@ -112,13 +114,20 @@ function markLastMove(startId, destinationId) {
 }
 
 async function handleMove(pieceId, destinationId) {
-    handleReset()
-    recreateAll()
-    addResetEvent();
 
     await sendMove(pieceId, destinationId);
     if(await onEachMove(pieceId, destinationId)=== false) {
         return false;
+    }
+    handleReset()
+    recreateAll()
+    addResetEvent();
+
+    if(humanPlayerColor === "WHITE"){
+        display("Czarne")
+    }
+    else {
+        display("Białe")
     }
     // await addMoveEventToPieces();
 
@@ -126,12 +135,28 @@ async function handleMove(pieceId, destinationId) {
      if(await onEachMove(move.startTile, move.destinationTile) === false){
          return false;
      }
-
     await addMoveEventToPieces();
 
+    if(humanPlayerColor === "WHITE"){
+        display("Białe")
+    }
+    else {
+        display("Czarne")
+    }
+
 }
-
-
+function display(text){
+    document.getElementById("result").innerText = text
+}
+function displayColor(color){
+    if(color === "WHITE"){
+        var c = "Białe"
+    }
+    else{
+        var c = "Czarne"
+    }
+    document.getElementById("result").innerText = c
+}
 
 
 
@@ -141,7 +166,7 @@ async function onEachMove(pieceId, destinationId){
     markLastMove(pieceId, destinationId);
 
     if (await checkFinished()) {
-        document.getElementById("result").innerText = "GAME FINISHED"
+        document.getElementById("result").innerText = "GRA ZAKOŃCZONA"
         return false;
     }
 
@@ -176,7 +201,6 @@ async function sendMove(pieceId, destinationId) {
         data: JSON.stringify(move),
         contentType: "application/json",
         success: function () {
-            // alert("data sent")
         }
 
     })
@@ -186,16 +210,20 @@ async function newGame(){
 
     var color = document.getElementById("color").value
 
+    display("Białe")
 
     await sendNewGameRequest(color);
-    await refreshBoard();
+    drawBoard(8,8, color)
+    drawPieces(await getCurrentState())
 
     if(color === "BLACK"){
-        await makeAIMove();
-        await onEachMove();
+        const move = await makeAIMove();
+        await onEachMove(move.startTile, move.destinationTile);
+        display("Czarne")
     }
 
-    await refreshBoard();
+    addResetEvent();
+    await addMoveEventToPieces()
 
     humanPlayerColor = color
 
@@ -210,7 +238,6 @@ async function refreshBoard(){
 
 async function sendNewGameRequest(c){
 
-    alert(c);
     let obj = {color: c}
     await $.ajax({
         type: "POST",
@@ -225,7 +252,6 @@ async function sendNewGameRequest(c){
 }
 
 function movePieceAtInterface(pieceId, destinationId) {
-    // alert(pieceId + " " + destinationId)
     let startElement = document.getElementById("tile-" + pieceId);
     let text = startElement.innerHTML;
     startElement.innerHTML = ''

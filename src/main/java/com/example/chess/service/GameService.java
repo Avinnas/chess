@@ -44,7 +44,18 @@ public class GameService {
     }
 
     public void abandonAndCreateNewGame(String color){
-        game = new Game(userService.getCurrentPlayer(), color);
+        if(game!=null){
+            moveService.deleteAllWithGameId(game.getId());
+            gameRepository.delete(game);
+        }
+        Color c;
+        if(color.equals("color=BLACK")){
+            c = Color.BLACK;
+        }
+        else{
+            c = Color.WHITE;
+        }
+        game = new Game(userService.getCurrentPlayer(), c);
         gameRepository.save(game);
     }
 
@@ -92,7 +103,7 @@ public class GameService {
 
     }
     public Move makeAIMove(){
-        Move move = AlgorithmAI.minmax(game.getBoard(), 5, false).getSecond();
+        Move move = AlgorithmAI.minmax(game.getBoard(), 5, game.getCurrentPlayer() == Color.WHITE).getSecond();
         Move moveToMake = MoveFactory.getMove(move, game.getBoard());
         moveToMake.setGame(game);
         moveService.addMove(moveToMake);

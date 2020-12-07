@@ -30,12 +30,16 @@ div .lastMoveEnd {
 
 .new-game{
     display: inline;
-    margin: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+
 }
 
 .right-container{
     display: inline;
     float: left;
+    margin: 20px;
+    width: 300px
 }
 
 .board {

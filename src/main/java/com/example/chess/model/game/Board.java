@@ -472,15 +472,15 @@ public class Board {
         var blackMoves = findCurrentPlayerMoves(Color.BLACK);
         boolean whiteChecked= false, blackChecked = false;
 
-        if (!findCheckingPieces(getKingTile(currentColor), findTilesControlled(getPlayerPieces(Color.WHITE))).isEmpty()) {
+        if (!findCheckingPieces(getKingTile(Color.WHITE), findTilesControlled(getPlayerPieces(Color.BLACK))).isEmpty()) {
             whiteChecked = true;
         }
-        if (!findCheckingPieces(getKingTile(currentColor), findTilesControlled(getPlayerPieces(Color.BLACK))).isEmpty()) {
+        if (!findCheckingPieces(getKingTile(Color.BLACK), findTilesControlled(getPlayerPieces(Color.WHITE))).isEmpty()) {
             blackChecked = true;
         }
 
-        if ((whiteMoves.isEmpty() && currentColor == Color.BLACK)
-                || ((blackMoves.isEmpty() && currentColor == Color.WHITE))
+        if ((whiteMoves.isEmpty() && currentColor == Color.WHITE)
+                || ((blackMoves.isEmpty() && currentColor == Color.BLACK))
                 || drawByMaterial()) {
             gameResult = 10;
         } else if (whiteMoves.isEmpty() && whiteChecked) {

@@ -118,14 +118,14 @@ public class AlgorithmAI {
         return captures;
     }
 
-    public static int evaluateBoard(Board board) {
+    public static int evaluateBoard(Board board, int depth) {
         int result = board.getGameResult();
         if(result == 10){
             return 0;
         } else if (result == 1){
-            return 100000;
+            return 100000 + depth;
         } else if (result == -1){
-            return -100000;
+            return -100000 - depth;
         }
 
         int sum = 0;
@@ -149,7 +149,7 @@ public class AlgorithmAI {
 
     public static Pair<Integer, Move> maximize(Board board, int depth, int alpha, int beta) {
         if (depth == 0) {
-            return Pair.of(evaluateBoard(board), new Move());
+            return Pair.of(evaluateBoard(board, depth), new Move());
         }
 
         int maxEval = Integer.MIN_VALUE;
@@ -157,7 +157,7 @@ public class AlgorithmAI {
         var movesMap = board.findCurrentPlayerMoves(Color.WHITE, true);
 
         if (board.getGameResult()!=0){
-            return Pair.of(evaluateBoard(board), new Move());
+            return Pair.of(evaluateBoard(board, depth), new Move());
         }
         var moves = generateListOfMoves(movesMap,board);
 
@@ -180,7 +180,7 @@ public class AlgorithmAI {
 
     public static Pair<Integer, Move> minimize(Board board, int depth, int alpha, int beta) {
         if (depth == 0) {
-            return Pair.of(evaluateBoard(board), new Move());
+            return Pair.of(evaluateBoard(board, depth), new Move());
         }
 
         int minEval = Integer.MAX_VALUE;
@@ -188,7 +188,7 @@ public class AlgorithmAI {
         Move bestMove = new Move();
 
         if (board.getGameResult()!=0){
-            return Pair.of(evaluateBoard(board), new Move());
+            return Pair.of(evaluateBoard(board, depth), new Move());
         }
 
         var moves = generateListOfMoves(movesMap,board);

@@ -17,7 +17,7 @@
     <title>Login</title>
 </head>
 <!-navbar starts-->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand">Szachy</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -62,10 +62,13 @@
                     <option value="BLACK">Czarne</option>
                 </select>
 
-                <button type="submit" class="new-game btn btn-lg btn-success btn-block" formmethod="post"> Nowa partia </button>
+
             </form>
 
+            <button type="submit" class="new-game btn btn-lg btn-success btn-block" th:onclick="'newGame();'" formmethod="post"> Nowa partia </button>
+
             <div >
+                <h1>Aktualny ruch: </h1>
                 <h1 id="result"></h1>
             </div>
 
@@ -83,10 +86,13 @@
 
 <script th:inline="javascript">
     $(document).ready(async function () {
-        drawBoard(8, 8)
+        humanPlayerColor = (await getGame()).humanPlayerColor
+
+        drawBoard(8, 8, humanPlayerColor)
+        displayColor(humanPlayerColor)
         await refreshBoard();
 
-        humanPlayerColor = (await getGame()).humanPlayerColor
+
     })
 </script>
 </html>
