@@ -92,6 +92,11 @@ public class Board {
 
     public HashMap<Integer, HashSet<Integer>> findCurrentPlayerMoves(Color currentColor) {
 
+        return findCurrentPlayerMoves(currentColor, false);
+    }
+
+    public HashMap<Integer, HashSet<Integer>> findCurrentPlayerMoves(Color currentColor, boolean findCheckmates) {
+
         var possibleMoves = findPseudoLegalMoves(currentColor);
 
         int kingTile = getKingTile(currentColor);
@@ -107,13 +112,15 @@ public class Board {
         excludeIllegalKingMoves(possibleMoves, tilesControlled, kingTile);
         possibleMoves = excludeIllegalMovesWhenChecked(possibleMoves, checkingPieces, kingTile);
 
-        if (possibleMoves.isEmpty()) {
+        if (possibleMoves.isEmpty() && findCheckmates) {
             findIfCheckmate(currentColor, !checkingPieces.isEmpty());
         }
 
-
         return possibleMoves;
     }
+
+
+
 
     public void excludeIllegalKingMoves
             (HashMap<Integer, HashSet<Integer>> possibleMoves, HashMap<Integer, HashSet<Integer>> tilesControlled, int kingTile) {
@@ -227,11 +234,14 @@ public class Board {
         while (currentTile != kingTile) {
             pinnedPieceMoves.add(currentTile);
             currentTile = moveTowardsKing(currentTile, kingTile);
+            if(tileIsOccupiedByOpponent(currentTile, pinningPieceColor.getOpponentColor()))
+                break;
             if (tileIsOccupiedByOpponent(currentTile, pinningPieceColor)) {
                 if (potentialPinnedPiece != 0) {
                     if (currentTile == kingTile) {
                         movesMap.put(potentialPinnedPiece, pinnedPieceMoves);
                     }
+                    break;
                 }
                 potentialPinnedPiece = currentTile;
             }
@@ -298,7 +308,8 @@ public class Board {
 
     public void makeCastlingMove(CastlingMove moveToMake) {
         makeDefaultMove(moveToMake);
-        makeMove(new Move(moveToMake.getRookStartTile(), moveToMake.getRookDestinationTile()));
+        Move m = new Move(moveToMake.getRookStartTile(), moveToMake.getRookDestinationTile());
+        makeDefaultMove(m);
     }
 
     public void makePromotionMove(PromotionMove moveToMake) {
@@ -352,8 +363,15 @@ public class Board {
     }
 
     public void calculateState(List<Move> moves) {
-        moves.forEach(this::makeMove);
+        for (Move m: moves){
+            this.makeMove(m);
+            System.out.println("move " + m);
+        }
     }
+    public void calculateState(List<Move> moves, int moveNumber) {
+        calculateState(moves.subList(0, moveNumber));
+    }
+
 
     public HashMap<Integer, Piece> getTilePieceAssignment() {
         return tilePieceAssignment;
@@ -454,15 +472,15 @@ public class Board {
         var blackMoves = findCurrentPlayerMoves(Color.BLACK);
         boolean whiteChecked= false, blackChecked = false;
 
-        if (findCheckingPieces(getKingTile(currentColor), findTilesControlled(getPlayerPieces(Color.WHITE))).isEmpty()) {
+        if (!findCheckingPieces(getKingTile(currentColor), findTilesControlled(getPlayerPieces(Color.WHITE))).isEmpty()) {
             whiteChecked = true;
         }
-        if (findCheckingPieces(getKingTile(currentColor), findTilesControlled(getPlayerPieces(Color.BLACK))).isEmpty()) {
+        if (!findCheckingPieces(getKingTile(currentColor), findTilesControlled(getPlayerPieces(Color.BLACK))).isEmpty()) {
             blackChecked = true;
         }
 
-        if ((whiteMoves.isEmpty() && currentColor == Color.WHITE)
-                || (blackMoves.isEmpty() && currentColor == Color.BLACK)
+        if ((whiteMoves.isEmpty() && currentColor == Color.BLACK)
+                || ((blackMoves.isEmpty() && currentColor == Color.WHITE))
                 || drawByMaterial()) {
             gameResult = 10;
         } else if (whiteMoves.isEmpty() && whiteChecked) {

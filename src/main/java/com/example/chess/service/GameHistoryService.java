@@ -1,6 +1,6 @@
 package com.example.chess.service;
 
-import com.example.chess.model.game.ArchiveBoard;
+import com.example.chess.model.game.Board;
 import com.example.chess.model.game.Game;
 import com.example.chess.model.game.GameRepository;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class GameHistoryService {
 
     GameRepository gameRepository;
     UserService userService;
-    ArchiveBoard board;
+    Game game;
 
     public GameHistoryService(GameRepository gameRepository, UserService userService) {
         this.gameRepository = gameRepository;
@@ -23,8 +23,7 @@ public class GameHistoryService {
     }
 
     public Game getFinishedGame(int gameId) {
-        Game game = gameRepository.findById(gameId).orElseThrow();
-        board = new ArchiveBoard(game.getMovesPlayed());
+        game = gameRepository.findById(gameId).orElseThrow();
         return game;
     }
 
@@ -33,8 +32,9 @@ public class GameHistoryService {
     }
 
     public Map<?,?> getBoardState(int moveId){
-        board.calculateState(moveId);
-        return board.getTilePieceAssignment();
+        game.setBoard(new Board());
+        game.calculateState(moveId);
+        return game.getBoardState();
     }
 
     public List<Integer> getFinishedGamesIds() {

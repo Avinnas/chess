@@ -123,9 +123,9 @@ public class AlgorithmAI {
         if(result == 10){
             return 0;
         } else if (result == 1){
-            return Integer.MAX_VALUE;
+            return 100000;
         } else if (result == -1){
-            return Integer.MIN_VALUE;
+            return -100000;
         }
 
         int sum = 0;
@@ -154,7 +154,7 @@ public class AlgorithmAI {
 
         int maxEval = Integer.MIN_VALUE;
         Move bestMove = new Move();
-        var movesMap = board.findCurrentPlayerMoves(Color.WHITE);
+        var movesMap = board.findCurrentPlayerMoves(Color.WHITE, true);
 
         if (board.getGameResult()!=0){
             return Pair.of(evaluateBoard(board), new Move());
@@ -184,7 +184,7 @@ public class AlgorithmAI {
         }
 
         int minEval = Integer.MAX_VALUE;
-        var movesMap = board.findCurrentPlayerMoves(Color.BLACK);
+        var movesMap = board.findCurrentPlayerMoves(Color.BLACK, true);
         Move bestMove = new Move();
 
         if (board.getGameResult()!=0){

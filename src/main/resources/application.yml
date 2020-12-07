@@ -10,3 +10,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  queries:
+    users-query: "select email, password, 'true' as enabled from USERS where email=?"
+    roles-query: "SELECT u.email, r.role FROM ROLE r, user_role ur, users u where r.role_id = ur.role_id and u.id = ur.id and u.email=?"

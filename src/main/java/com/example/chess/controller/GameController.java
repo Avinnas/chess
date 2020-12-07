@@ -2,6 +2,7 @@ package com.example.chess.controller;
 
 
 import com.example.chess.model.dto.MoveDto;
+import com.example.chess.model.game.Game;
 import com.example.chess.model.game.Move;
 import com.example.chess.model.pieces.Piece;
 import com.example.chess.service.GameService;
@@ -56,6 +57,12 @@ public class GameController {
         gameService.newMove(moveToMake);
     }
 
+    @GetMapping("/show_game")
+    @ResponseBody
+    public Game showGame(){
+        return gameService.getCurrentGameObject();
+    }
+
     @GetMapping("/last_move")
     @ResponseBody
     public Move showLastMove(){
@@ -70,7 +77,7 @@ public class GameController {
 
     @PostMapping("/new")
     @ResponseBody
-    public void newGame() {gameService.abandonAndCreateNewGame();}
+    public void newGame(@RequestBody String color) {gameService.abandonAndCreateNewGame(color);}
 
 
 

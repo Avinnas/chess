@@ -120,17 +120,21 @@ async function handleMove(pieceId, destinationId) {
     if(await onEachMove(pieceId, destinationId)=== false) {
         return false;
     }
-    await addMoveEventToPieces();
+    // await addMoveEventToPieces();
 
-     // const move = await makeAIMove();
+     const move = await makeAIMove();
      if(await onEachMove(move.startTile, move.destinationTile) === false){
          return false;
      }
 
     await addMoveEventToPieces();
 
-
 }
+
+
+
+
+
 async function onEachMove(pieceId, destinationId){
 
     drawPieces(await getCurrentState())
@@ -179,8 +183,21 @@ async function sendMove(pieceId, destinationId) {
 
 }
 async function newGame(){
-    await sendNewGameRequest();
+
+    var color = document.getElementById("color").value
+
+
+    await sendNewGameRequest(color);
     await refreshBoard();
+
+    if(color === "BLACK"){
+        await makeAIMove();
+        await onEachMove();
+    }
+
+    await refreshBoard();
+
+    humanPlayerColor = color
 
 }
 
@@ -191,12 +208,17 @@ async function refreshBoard(){
     await addMoveEventToPieces()
 }
 
-async function sendNewGameRequest(){
+async function sendNewGameRequest(c){
+
+    alert(c);
+    let obj = {color: c}
     await $.ajax({
         type: "POST",
         url: "/game/new",
+        data: JSON.stringify(obj),
+        contentType: "application/json",
         success: function () {
-            alert("sending")
+            //
         }
     });
 
@@ -264,3 +286,16 @@ async function checkFinished() {
     )
     return await finished;
 }
+
+async function getGame() {
+    var state;
+    await $.ajax({
+            url: "game/show_game",
+            success: function (data) {
+                state = data
+            }
+        }
+    )
+    return await state;
+}
+

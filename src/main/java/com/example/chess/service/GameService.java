@@ -29,19 +29,22 @@ public class GameService {
 
     public Game getOrCreateCurrentGame() {
         User user = userService.getCurrentPlayer();
-        Optional<Game> optionalGame = gameRepository.findTopByUserIdAndFinishedIsFalseOrderByIdDesc(0);
+        Optional<Game> optionalGame = gameRepository.findTopByUserIdAndFinishedIsFalseOrderByIdDesc(user.getId());
         if (optionalGame.isPresent()) {
-            Game game = optionalGame.get();
+            game = optionalGame.get();
 
             game.calculateState();
+            if(game.getCurrentPlayer()!= game.getHumanPlayerColor()){
+                makeAIMove();
+            }
             return game;
         } else {
             return gameRepository.save(new Game(user));
         }
     }
 
-    public void abandonAndCreateNewGame(){
-        game = new Game(userService.getCurrentPlayer());
+    public void abandonAndCreateNewGame(String color){
+        game = new Game(userService.getCurrentPlayer(), color);
         gameRepository.save(game);
     }
 
@@ -51,6 +54,14 @@ public class GameService {
         }
 
         return game.getBoardState();
+    }
+
+    public Game getCurrentGameObject(){
+        if(game == null){
+            this.game = getOrCreateCurrentGame();
+        }
+
+        return game;
     }
 
     public List<Piece> getPlayerPieces() {
@@ -81,8 +92,8 @@ public class GameService {
 
     }
     public Move makeAIMove(){
-        Move moveDto = AlgorithmAI.minmax(game.getBoard(), 5, false).getSecond();
-        Move moveToMake = MoveFactory.getMove(moveDto, game.getBoard());
+        Move move = AlgorithmAI.minmax(game.getBoard(), 5, false).getSecond();
+        Move moveToMake = MoveFactory.getMove(move, game.getBoard());
         moveToMake.setGame(game);
         moveService.addMove(moveToMake);
         game.makeMove(moveToMake);

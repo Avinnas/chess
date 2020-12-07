@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" th:href="@{styles.css}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+
+    <title>Registration</title>
+</head>
+<!-navbar starts-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">shop-app</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/game">Zagraj<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/history">Historia gier</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/login">Logowanie</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/registration">Rejestracja</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-navbar ends-->
+
+<body style = "padding: 40px">
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+
+            <div th:if="${successMessage}">
+                <div class="alert alert-info">
+                    Rejestracja przebiegła pomyślnie
+                </div>
+            </div>
+
+            <h1>Rejestracja</h1>
+            <form th:action="@{/registration}" th:object="${user}" method="post">
+
+                <p class="error-message"
+                   th:if="${#fields.hasGlobalErrors()}"
+                   th:each="error : ${#fields.errors('global')}"
+                   th:text="${error}">Validation error</p>
+
+                <div class="form-group"
+                     th:classappend="${#fields.hasErrors('email')}? 'has-error':''">
+                    <label for="email" class="control-label">E-mail</label>
+                    <input id="email"
+                           class="form-control"
+                           th:field="*{email}"/>
+                    <div class="alert alert-danger"
+                       th:each="error : ${#fields.errors('email')}"
+                       th:text="${error}">Validation error</div>
+                </div>
+                <div class="form-group"
+                     th:classappend="${#fields.hasErrors('password')}? 'has-error':''">
+                    <label for="password" class="control-label">Password</label>
+                    <input id="password"
+                           class="form-control"
+                           type="password"
+                           th:field="*{password}"/>
+                    <div class="alert alert-danger"
+                       th:each="error : ${#fields.errors('password')}"
+                       th:text="${error}">Validation error</div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Zarejestruj</button>
+                    <span>Jesteś już zarejestrowany? <a href="/" th:href="@{/login}">Zaloguj się</a></span>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

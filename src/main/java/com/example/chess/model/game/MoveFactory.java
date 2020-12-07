@@ -5,19 +5,20 @@ import com.example.chess.model.dto.MoveDto;
 import static java.lang.Math.abs;
 
 public class MoveFactory {
-    public static Move getMove(MoveDto moveDto, Board board){
-        var move = getSimpleMove(moveDto, board);
-        move.calculateHash(board);
-        return move;
+    public static Move getMove(MoveDto move, Board board){
+        var m = getSimpleMove(move.getStartTile(), move.getDestinationTile(), board);
+        m.calculateHash(board);
+        return m;
     }
     public static Move getMove(Move move, Board board){
-        move.calculateHash(board);
-        return move;
+        Move m = getSimpleMove(move,board);
+        m.calculateHash(board);
+        return m;
     }
 
 
-    public static Move getSimpleMove(MoveDto moveDto, Board board) {
-        return getSimpleMove(moveDto.getStartTile(), moveDto.getDestinationTile(), board);
+    public static Move getSimpleMove(Move move, Board board) {
+        return getSimpleMove(move.getStartTile(), move.getDestinationTile(), board);
     }
 
     public static Move getSimpleMove(int startTile, int destinationTile, Board board){
@@ -26,7 +27,7 @@ public class MoveFactory {
             return new CastlingMove(startTile, destinationTile);
         }
         else if(board.getPiece(startTile).getName().equals("Pawn")
-                && ((destinationTile /8)==0 || (destinationTile /7)==0)){
+                && ((destinationTile /8)==0 || (destinationTile /8)==7)){
             return new PromotionMove(startTile, destinationTile, 'Q');
         }
         return new Move(startTile, destinationTile);

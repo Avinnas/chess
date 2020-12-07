@@ -19,10 +19,10 @@ public class Pawn extends Piece {
         int column = tileNumber % 8;
         if (this.color == Color.WHITE) {
             int destinationTile = tileNumber - 8;
-            if (board.tileIsEmpty(destinationTile)) {
+            if (board.tileIsEmpty(destinationTile) && destinationTile>=0 && destinationTile <64) {
                 possibleMoves.add(destinationTile);
                 destinationTile -= 8;
-                if (row == 7 && (board.tileIsEmpty(destinationTile))) {
+                if (row == 7 && (board.tileIsEmpty(destinationTile))  && destinationTile>=0F) {
                     possibleMoves.add(destinationTile);
                 }
             }
@@ -36,10 +36,10 @@ public class Pawn extends Piece {
         } else {
 
             int destinationTile = tileNumber + 8;
-            if (board.tileIsEmpty(destinationTile)) {
+            if (board.tileIsEmpty(destinationTile)  && destinationTile>=0 && destinationTile <64) {
                 possibleMoves.add(destinationTile);
                 destinationTile += 8;
-                if (row == 2 && (board.tileIsEmpty(destinationTile))) {
+                if (row == 2 && (board.tileIsEmpty(destinationTile)) && destinationTile <64) {
                     possibleMoves.add(destinationTile);
                 }
             }

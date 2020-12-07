@@ -3,6 +3,8 @@ package com.example.chess.model.game;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Entity
@@ -12,8 +14,13 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
-    String name;
-    String lastname;
+
+    @Email(message = "Wprowadź poprawny e-mail")
+    @NotEmpty(message = "Wprowadź e-mail")
+    String email;
+
+    @NotEmpty(message = "Wprowadź hasło")
+    String password;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -22,9 +29,12 @@ public class User {
     public User() {
     }
 
-    public User(String name, String lastname) {
-        this.name = name;
-        this.lastname = lastname;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String username) {
+        this.email = username;
     }
 
     public int getId() {
@@ -35,20 +45,12 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getPassword() {
+        return password;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Game> getGames() {
@@ -58,4 +60,5 @@ public class User {
     public void setGames(List<Game> games) {
         this.games = games;
     }
+
 }

@@ -46,6 +46,11 @@ public class Game {
         this();
         this.user = user;
     }
+    public Game(User user, String color){
+        this(user);
+        if(color.equals("BLACK"))
+            this.humanPlayerColor = Color.BLACK;
+    }
 
 
     public HashMap<Integer, Piece> getBoardState() {
@@ -108,37 +113,33 @@ public class Game {
 
 
     public void castMoveTypes(){
+        Board boardCopy = new Board(board);
         for(int i=0; i< movesPlayed.size(); i++){
             Move move = movesPlayed.get(i);
-            if(move.getHash().equals("O-O")){
-                CastlingMove castedMove = (CastlingMove) move;
-                castedMove.calculateRookPosition(false);
-                movesPlayed.set(i, castedMove);
+
+            Move castedMove = MoveFactory.getSimpleMove(move,boardCopy);
+
+            boardCopy.makeMove(castedMove);
+            movesPlayed.set(i, castedMove);
             }
-            if(move.getHash().equals("O-O-O")){
-                CastlingMove castedMove = (CastlingMove) move;
-                castedMove.calculateRookPosition(true);
-                movesPlayed.set(i, castedMove);
-            }
-            if(move.getHash().contains("=")){
-                PromotionMove castedMove = (PromotionMove) move;
-                castedMove.setPromotedClass(move.getHash().charAt(move.getHash().length()-1));
-                movesPlayed.set(i, castedMove);
-            }
-        }
     }
-    public void calculateState() {
+    public void calculateState(int moveNumber) {
         this.castMoveTypes();
         List <Move> moves = movesPlayed;
 
-        board.calculateState(moves);
+        board.calculateState(moves.subList(0, moveNumber));
         if(moves.size()==0){
             setCurrentPlayer(Color.WHITE);
         }
         else{
-            setCurrentPlayer(getBoardState().get(moves.get(moves.size()-1).getDestinationTile())
+            setCurrentPlayer(getBoardState().get(moves.get(moveNumber-1).getDestinationTile())
                     .getColor().getOpponentColor());
         }
+
+    }
+
+    public void calculateState() {
+        calculateState(movesPlayed.size());
 
     }
 

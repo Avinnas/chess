@@ -7,17 +7,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <title>Szachy</title>
-    <link rel="stylesheet" href="boardStyle.css">
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" th:href="@{styles.css}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="script.js"></script>
-
     <title>Login</title>
 </head>
 <!-navbar starts-->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand">Szachy</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -39,56 +35,37 @@
     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
             <li>
-                <a class="btn btn-danger" href="/logout">Wyloguj</a>
-
+                <button class="btn btn-danger" type="submit" th:onclick="/logout" rel="nofollow">
+                    Wyloguj
+                </button>
             </li>
         </ul>
     </div>
 </nav>
 <!-navbar ends-->
-<body>
-<div>
-    <div class="board-box">
-        <div class="board" id="chessBoard"></div>
-
-
-        <div class="right-container">
-
-            <form name="myForm" method="post"  action="/game/new">
-
-                <label class="form-check-label" for="color">Wybierz kolor:</label>
-                <select class="form-control" name="color" id="color">
-                    <option value="WHITE">Białe</option>
-                    <option value="BLACK">Czarne</option>
-                </select>
-
-                <button type="submit" class="new-game btn btn-lg btn-success btn-block" formmethod="post"> Nowa partia </button>
-            </form>
-
-            <div >
-                <h1 id="result"></h1>
+<body style="padding: 40px">
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div th:if="${param.error}">
+                <div class="alert alert-danger">
+                    Niepoprawna nazwa użytkownika lub hasło
+                </div>
             </div>
-
+            <div th:if="${param.logout}">
+                <div class="alert alert-info">
+                    Zostałeś wylogowany
+                </div>
+            </div>
+            <h1>Logowanie</h1>
+            <form th:action="@{/login}" method="post">
+                <div class="form-group"><label> E-mail : <input type="text" class="form-control" name="username"/> </label></div>
+                <div><label> Password: <input type="password" class="form-control" name="password"/> </label></div>
+                <button type="submit" class="btn btn-success">Zaloguj się</button>
+                <span>Nie masz konta? <a href="/" th:href="@{/registration}">Zarejestruj się</a></span>
+            </form>
         </div>
-
     </div>
-
-
-
-
 </div>
-
-
 </body>
-
-<script th:inline="javascript">
-    $(document).ready(async function () {
-        drawBoard(8, 8)
-        await refreshBoard();
-
-        humanPlayerColor = (await getGame()).humanPlayerColor
-    })
-</script>
 </html>
-
-<body>
