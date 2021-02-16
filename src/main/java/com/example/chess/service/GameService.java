@@ -5,10 +5,7 @@ import com.example.chess.model.game.*;
 import com.example.chess.model.pieces.Piece;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -46,10 +43,11 @@ public class GameService {
     public void abandonAndCreateNewGame(String color){
         if(game!=null){
             moveService.deleteAllWithGameId(game.getId());
+            game.setMovesPlayed(new ArrayList<>());
             gameRepository.delete(game);
         }
         Color c;
-        if(color.equals("color=BLACK")){
+        if(color.equals("BLACK")){
             c = Color.BLACK;
         }
         else{
@@ -121,5 +119,19 @@ public class GameService {
         return finished;
     }
 
+    public void abortGameInstance(){
+        if(game!=null){
+            gameRepository.save(game);
+        }
 
+        game = null;
+    }
+
+
+    public Color getPlayer() {
+        if(game == null){
+            this.game = getOrCreateCurrentGame();
+        }
+        return game.getHumanPlayerColor();
+    }
 }

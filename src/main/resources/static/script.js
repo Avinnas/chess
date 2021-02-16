@@ -1,7 +1,7 @@
 /*<![CDATA[*/
 function drawBoard(x, y, playerColor) {
     document.getElementById("chessBoard").innerHTML = ""
-    var isWhite = playerColor !== "BLACK";
+    var isWhite = playerColor === "WHITE";
     var chessBoard = document.getElementById("chessBoard");
     for (var i = 0; i < 64; i++) {
         var tile = document.createElement('div');
@@ -9,11 +9,11 @@ function drawBoard(x, y, playerColor) {
         tile.className = "tile"
 
         if (Math.floor((i / 8)) % 2 === 0) {
-            if (i % 2 === 0) {
+            if (i % 2 === 1) {
                 tile.classList.add("black");
             }
         } else {
-            if (i % 2 === 1) {
+            if (i % 2 === 0) {
                 tile.classList.add("black");
             }
         }
@@ -47,14 +47,6 @@ function handleReset() {
         elements[0].parentNode.addEventListener("click", handleReset);
         elements[0].parentNode.removeChild(elements[0]);
     }
-
-    // elements = document.getElementsByClassName("movingPiece")
-    //
-    // while (elements.length > 0) {
-    //     recreateElement(elements[0].parentNode);
-    //     elements[0].parentNode.addEventListener("click", handleReset);
-    //     elements[0].parentNode.removeChild(elements[0]);
-    // }
 }
 
 function handlePieceClick(id, pieceMoves) {
@@ -129,7 +121,6 @@ async function handleMove(pieceId, destinationId) {
     else {
         display("Białe")
     }
-    // await addMoveEventToPieces();
 
      const move = await makeAIMove();
      if(await onEachMove(move.startTile, move.destinationTile) === false){
@@ -238,11 +229,10 @@ async function refreshBoard(){
 
 async function sendNewGameRequest(c){
 
-    let obj = {color: c}
     await $.ajax({
         type: "POST",
         url: "/game/new",
-        data: JSON.stringify(obj),
+        data: c,
         contentType: "application/json",
         success: function () {
             //
@@ -271,9 +261,7 @@ async function addMoveEventToPieces() {
         let element = document.getElementById("tile-" + tileId)
         element = recreateElement(element);
         element.addEventListener("click", () => handlePieceClick(tileId, moves[tileId]))
-        // let possibleMovingPiece = document.createElement("div");
-        // possibleMovingPiece.className = "movingPiece";
-        // element.appendChild(possibleMovingPiece);
+
     }
 }
 
@@ -311,6 +299,18 @@ async function checkFinished() {
         }
     )
     return await finished;
+}
+
+async function getPlayer() {
+    var state;
+    await $.ajax({
+            url: "game/player",
+            success: function (data) {
+                state = data
+            }
+        }
+    )
+    return await state;
 }
 
 async function getGame() {
