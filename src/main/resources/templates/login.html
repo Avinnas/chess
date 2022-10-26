@@ -32,15 +32,17 @@
 
         </ul>
     </div>
-    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-        <ul class="navbar-nav ml-auto">
-            <li>
-                <button class="btn btn-danger" type="submit" th:onclick="/logout" rel="nofollow">
-                    Wyloguj
-                </button>
-            </li>
-        </ul>
-    </div>
+<!--    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">-->
+<!--        <ul class="navbar-nav ml-auto">-->
+<!--            <li>-->
+<!--                <form name="myForm" method="post" action="/logout_custom" rel="nofollow">-->
+<!--                <button class="btn btn-danger" type="submit" rel="nofollow">-->
+<!--                    Wyloguj-->
+<!--                </button>-->
+<!--                </form>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </div>-->
 </nav>
 <!-navbar ends-->
 <body style="padding: 40px">
@@ -60,7 +62,7 @@
             <h1>Logowanie</h1>
             <form th:action="@{/login}" method="post">
                 <div class="form-group"><label> E-mail : <input type="text" class="form-control" name="username"/> </label></div>
-                <div><label> Password: <input type="password" class="form-control" name="password"/> </label></div>
+                <div><label> Hasło: <input type="password" class="form-control" name="password"/> </label></div>
                 <button type="submit" class="btn btn-success">Zaloguj się</button>
                 <span>Nie masz konta? <a href="/" th:href="@{/registration}">Zarejestruj się</a></span>
             </form>

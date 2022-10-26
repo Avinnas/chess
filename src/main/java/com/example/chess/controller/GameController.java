@@ -2,6 +2,7 @@ package com.example.chess.controller;
 
 
 import com.example.chess.model.dto.MoveDto;
+import com.example.chess.model.game.Color;
 import com.example.chess.model.game.Game;
 import com.example.chess.model.game.Move;
 import com.example.chess.model.pieces.Piece;
@@ -49,6 +50,12 @@ public class GameController {
     @ResponseBody
     public HashMap<Integer, HashSet<Integer>> showPlayerMoves() {
         return gameService.getPossibleCurrentPlayerMoves();
+    }
+
+    @GetMapping("player")
+    @ResponseBody
+    public Color showPlayer(){
+        return gameService.getPlayer();
     }
 
     @PostMapping

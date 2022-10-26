@@ -3,6 +3,7 @@ package com.example.chess.service;
 import com.example.chess.model.game.Board;
 import com.example.chess.model.game.Game;
 import com.example.chess.model.game.GameRepository;
+import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,8 +23,12 @@ public class GameHistoryService {
         this.userService = userService;
     }
 
-    public Game getFinishedGame(int gameId) {
+    public Game getFinishedGame(int gameId) throws NotFoundException {
         game = gameRepository.findById(gameId).orElseThrow();
+        if(game.getUser().getId() != userService.getCurrentPlayerId())
+        {
+            throw new NotFoundException("Not found");
+        }
         return game;
     }
 

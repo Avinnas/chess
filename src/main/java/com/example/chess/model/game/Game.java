@@ -33,7 +33,7 @@ public class Game {
     Date dateFinished;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     List<Move> movesPlayed = new ArrayList<>();
 
     public Game() {
@@ -48,7 +48,7 @@ public class Game {
     }
     public Game(User user, Color color) {
         this(user);
-        this.humanPlayerColor = Color.BLACK;
+        this.humanPlayerColor = color;
     }
 
 
@@ -59,9 +59,6 @@ public class Game {
     }
 
     public HashMap<Integer, HashSet<Integer>> getPossibleCurrentPlayerMoves() {
-        if(currentPlayer != humanPlayerColor){
-            System.out.println(" RETURNED MOVES FOR AI ");
-        }
 
         return board.findCurrentPlayerMoves(currentPlayer);
     }

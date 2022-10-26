@@ -100,9 +100,7 @@ public class Board {
         var possibleMoves = findPseudoLegalMoves(currentColor);
 
         int kingTile = getKingTile(currentColor);
-        if (kingTile == -1) {
-            System.out.println("No king on board");
-        }
+
         var opponentPieces = getPlayerPieces(currentColor.getOpponentColor());
         var tilesControlled = findTilesControlled(opponentPieces);
         var checkingPieces = findCheckingPieces(getKingTile(currentColor), tilesControlled);
@@ -365,7 +363,6 @@ public class Board {
     public void calculateState(List<Move> moves) {
         for (Move m: moves){
             this.makeMove(m);
-            System.out.println("move " + m);
         }
     }
     public void calculateState(List<Move> moves, int moveNumber) {

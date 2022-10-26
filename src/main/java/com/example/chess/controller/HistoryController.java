@@ -1,8 +1,8 @@
 package com.example.chess.controller;
 
 import com.example.chess.service.GameHistoryService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javassist.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,22 +29,15 @@ public class HistoryController {
         return "history";
     }
     @GetMapping("/{id}")
-    public String showFinishedGame(Model model, @PathVariable int id) throws JsonProcessingException {
+    public String showFinishedGame(Model model, @PathVariable int id) throws NotFoundException {
         ObjectMapper mapper = new ObjectMapper();
-        model.addAttribute("game", gameHistoryService.getFinishedGame(id));
+        try{
+            model.addAttribute("game", gameHistoryService.getFinishedGame(id));
+        } catch (Exception e ){
+            return "error";
+        }
         return "archive_game";
     }
-
-//    @GetMapping
-//    @ResponseBody
-//    public List<Game> showPlayerGamesHistory(){
-//        return gameHistoryService.getGameHistory();
-//    }
-//    @GetMapping("/{id}")
-//    @ResponseBody
-//    public Game showFinishedGame(@PathVariable int id){
-//        return gameHistoryService.getFinishedGame(id);
-//    }
 
     @GetMapping("/move/{moveId}")
     @ResponseBody

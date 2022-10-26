@@ -1,26 +1,81 @@
 <!DOCTYPE html>
-
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-
-
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 <head>
-    <meta charset="UTF-8">
-    <title>Game history</title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>Szachy</title>
     <link rel="stylesheet" href="/boardStyle.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="/styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="/script.js"></script>
+    <script src="/history.js"></script>
 
 
+    <title>Login</title>
 </head>
+<!-navbar starts-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand">Szachy</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/game">Graj</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/history">Historia Gier</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/registration">Rejestracja</a>
+            </li>
 
+        </ul>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+            <li>
+                <form name="myForm" method="post" action="/logout_custom" rel="nofollow">
+                    <button class="btn btn-danger" type="submit" rel="nofollow">
+                        Wyloguj
+                    </button>
+                </form>
 
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-navbar ends-->
 <body>
 <div>
-    <div class="board" id="chessBoard"></div>
-    <div th:text="${game.id}"></div>
-    <tr th:each="move: ${game.movesPlayed}">
-        <td><button class="move" th:onclick="'goToMove(\'' + ${moveStat.index+1} + '\');'" th:text ="${move.hash}"> Game </button> </td>
-    </tr>
+    <h1 class="history-header">Historia gier</h1>
+    <div class="board-box">
+        <div>
+            <div class="board" id="chessBoard"></div>
+            <div class="move-container">
+                <h3> Wybierz ruch: </h3>
+                <tr th:each="move: ${game.movesPlayed}">
+                    <td><button class="btn move" th:classappend="${moveStat.odd} ? 'btn-light' : 'btn-dark' " th:onclick="'goToMove(\'' + ${moveStat.index+1} + '\');'" th:text ="${moveStat.index/2+1} +'. ' + ${move.hash}"> Game </button> </td>
+                </tr>
+
+
+            </div>
+            <div class="result-container">
+                <h3> Wynik gry: </h3>
+                <h3 id="result"> </h3>
+            </div>
+
+        </div>
+
+    </div>
+
+
 
 
 </div>
@@ -28,40 +83,17 @@
 
 </body>
 
+
 <script th:inline="javascript">
     /*<![CDATA[*/
 
     var game = /*[[${game}]]*/ 'default';
-    console.log(game);
     $(document).ready(function () {
-        drawBoard(8, 8, "#af875f")
+        drawBoard(8, 8, game.humanPlayerColor)
         drawPieces(game.boardState)
+        displayResult(game.gameResult);
 
     })
-    function removePieces(){
-        for(let i=0; i<64; i++){
-            let element = document.getElementById("tile-"+i)
-            element.innerHTML= ''
-        }
-    }
-    async function goToMove(moveId){
-
-        let state = await getStateAfterMove(moveId)
-        removePieces()
-        drawPieces(state);
-    }
-
-    async function getStateAfterMove(moveId){
-        var state;
-        await $.ajax({
-            url: "/history/move/"+moveId,
-            success: function (data){
-                state = data;
-            }
-        })
-        console.log(state)
-        return state;
-    }
 
     /*]]>*/
 </script>
