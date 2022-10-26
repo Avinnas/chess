@@ -116,10 +116,10 @@ async function handleMove(pieceId, destinationId) {
     addResetEvent();
 
     if(humanPlayerColor === "WHITE"){
-        display("Czarne")
+        display("Black")
     }
     else {
-        display("Białe")
+        display("White")
     }
 
      const move = await makeAIMove();
@@ -129,10 +129,10 @@ async function handleMove(pieceId, destinationId) {
     await addMoveEventToPieces();
 
     if(humanPlayerColor === "WHITE"){
-        display("Białe")
+        display("White")
     }
     else {
-        display("Czarne")
+        display("Black")
     }
 
 }
@@ -141,10 +141,10 @@ function display(text){
 }
 function displayColor(color){
     if(color === "WHITE"){
-        var c = "Białe"
+        var c = "White"
     }
     else{
-        var c = "Czarne"
+        var c = "Black"
     }
     document.getElementById("result").innerText = c
 }
@@ -157,7 +157,7 @@ async function onEachMove(pieceId, destinationId){
     markLastMove(pieceId, destinationId);
 
     if (await checkFinished()) {
-        document.getElementById("result").innerText = "GRA ZAKOŃCZONA"
+        document.getElementById("result").innerText = "Game finished"
         return false;
     }
 
@@ -201,7 +201,7 @@ async function newGame(){
 
     var color = document.getElementById("color").value
 
-    display("Białe")
+    display("White")
 
     await sendNewGameRequest(color);
     drawBoard(8,8, color)
@@ -210,7 +210,7 @@ async function newGame(){
     if(color === "BLACK"){
         const move = await makeAIMove();
         await onEachMove(move.startTile, move.destinationTile);
-        display("Czarne")
+        display("Black")
     }
 
     addResetEvent();

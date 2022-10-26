@@ -4,4 +4,9 @@ div .alert {
 
 body {
     padding: 40px;
+    max-width: 1536px;
+    max-height: 100vh;
+    margin: 0 auto;
 }
+
+

@@ -7,31 +7,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <title>Szachy</title>
+    <title>Chess</title>
     <link rel="stylesheet" href="/boardStyle.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" th:href="@{styles.css}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="script.js"></script>
 
-    <title>Login</title>
 </head>
 <!-navbar starts-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand">Szachy</a>
+    <a class="navbar-brand">Chess</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="/game">Graj</a>
+                <a class="nav-link" href="/game">Play</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="/history">Historia Gier</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/registration">Rejestracja</a>
+                <a class="nav-link active" href="/history">Game History</a>
             </li>
 
         </ul>
@@ -41,9 +37,10 @@
             <li>
                 <form name="myForm" method="post" action="/logout_custom" rel="nofollow">
                     <button class="btn btn-danger" type="submit" rel="nofollow">
-                        Wyloguj
+                        Logout
                     </button>
                 </form>
+
             </li>
         </ul>
     </div>
@@ -51,16 +48,14 @@
 <!-navbar ends-->
 <body>
 <div>
-    <h1 class="history-header"> Historia gier</h1>
+    <h1 class="history-header"> Game history</h1>
     <div class="board-box">
-        <div>
             <div class="board" id="chessBoard"></div>
             <div class="right-container">
-                <h3> Wybierz grę: </h3>
+                <h3> Choose game: </h3>
                 <tr th:each="g: ${finishedGames}">
                     <td><a class="btn btn-success" th:href="@{'/history/'+${g}}" th:text ="${gStat.index}"> Game </a> </td>
                 </tr>
-            </div>
 
 
         </div>
@@ -82,12 +77,3 @@
     })
 </script>
 </html>
-
-
-
-<!--<script th:inline="javascript">-->
-<!--    $(document).ready(async function () {-->
-<!--        drawBoard(8, 8, "#af875f")-->
-
-<!--    })-->
-<!--</script>-->

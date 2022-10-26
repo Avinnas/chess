@@ -1,37 +1,36 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <title>Szachy</title>
+    <title>Chess</title>
     <link rel="stylesheet" href="boardStyle.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" th:href="@{styles.css}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="script.js"></script>
 
-    <title>Login</title>
 </head>
 <!-navbar starts-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand">Szachy</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand">Chess</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link active" href="/game">Graj</a>
+                <a class="nav-link active" href="/game">Play</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/history">Historia Gier</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/registration">Rejestracja</a>
+                <a class="nav-link" href="/history">Game History</a>
             </li>
 
         </ul>
@@ -41,46 +40,43 @@
             <li>
                 <form name="myForm" method="post" action="/logout_custom" rel="nofollow">
                     <button class="btn btn-danger" type="submit" rel="nofollow">
-                        Wyloguj
+                        Logout
                     </button>
                 </form>
+
             </li>
         </ul>
     </div>
 </nav>
 <!-navbar ends-->
 <body>
-<div>
-    <div class="board-box">
-        <div class="board" id="chessBoard"></div>
+<div class="board-box">
+    <div class="board" id="chessBoard"></div>
 
 
-        <div class="right-container">
+    <div class="right-container">
 
-            <form name="myForm" method="post"  action="/game/new">
+        <form name="myForm" method="post" action="/game/new">
 
-                <label class="form-check-label" for="color">Wybierz kolor:</label>
-                <select class="form-control" name="color" id="color">
-                    <option value="WHITE">Białe</option>
-                    <option value="BLACK">Czarne</option>
-                </select>
+            <label class="form-check-label" for="color">Choose color:</label>
+            <select class="form-control" name="color" id="color">
+                <option value="WHITE">White</option>
+                <option value="BLACK">Black</option>
+            </select>
 
 
-            </form>
+        </form>
 
-            <button type="submit" class="new-game btn btn-lg btn-success btn-block" th:onclick="'newGame();'" formmethod="post"> Nowa partia </button>
+        <button type="submit" class="new-game btn btn-lg btn-success btn-block" th:onclick="'newGame();'"
+                formmethod="post"> New game
+        </button>
 
-            <div >
-                <h1>Aktualny ruch: </h1>
-                <h1 id="result"></h1>
-            </div>
-
+        <div>
+            <h1 class="current-move">Current move: </h1>
+            <h1 id="result"></h1>
         </div>
 
     </div>
-
-
-
 
 </div>
 

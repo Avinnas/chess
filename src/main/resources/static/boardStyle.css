@@ -1,5 +1,5 @@
-body{
-    background-color: gray; !important;
+div {
+    max-height: 100%;
 }
 
 img {
@@ -22,14 +22,14 @@ div .lastMoveEnd {
     height: 100%;
 }
 .history-header{
-    margin-left: 20px;
+    margin: 30px;
+    text-align: center;
 }
 
 .board-box{
-    margin: 10px;
-    display: inline-block;
-    height: calc(84px * 8);
-    width: calc(84px * 8 + 600px);
+    margin: 10px auto auto;
+    display: flex;
+    justify-content: center;
 }
 
 .new-game{
@@ -45,7 +45,7 @@ div .lastMoveEnd {
     float: left;
     margin: 20px;
     width: 250px;
-    height: calc(84px *7);
+    max-height: calc(84px *6);
 }
 
 .result-container{
@@ -55,16 +55,14 @@ div .lastMoveEnd {
 }
 
 .right-container{
-    display: inline;
-    float: left;
+    display: inline-block;
     margin: 20px;
     width: 300px;
+    max-height: calc(84px *8);
 }
 
 .board {
-    float: left;
 
-    margin: auto;
     border: 2px solid lightGray;
     box-sizing: content-box;
     display: flex;
@@ -112,4 +110,12 @@ div .black{
     width: 100px;
     background-color: darkgoldenrod;
     margin: 5px;
+}
+
+#result {
+    text-align: center;
+}
+
+.current-move {
+    text-align: center;
 }

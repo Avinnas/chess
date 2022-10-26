@@ -26,15 +26,15 @@ async function getStateAfterMove(moveId){
 function displayResult(result){
     let resultElement = document.getElementById("result")
     if(result===10){
-        resultElement.innerHTML= "Remis"
+        resultElement.innerHTML= "Draw"
     }
     else if(result===-1){
-        resultElement.innerHTML= "Wygrana czarnych"
+        resultElement.innerHTML= "Black won"
     }
     else if(result===1){
-        resultElement.innerHTML= "Wygrana białych"
+        resultElement.innerHTML= "White won"
     }
     else{
-        resultElement.innerHTML= "Nieukończona"
+        resultElement.innerHTML= "Not finished"
     }
 }
