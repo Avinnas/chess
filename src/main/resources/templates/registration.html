@@ -27,7 +27,13 @@
                 <a class="nav-link" href="/game">Play</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="/history">Game History</a>
+                <a class="nav-link" href="/history">Game History</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/login">Sign In</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/registration">Sign Up</a>
             </li>
 
         </ul>
@@ -42,7 +48,7 @@
 
             <div th:if="${successMessage}">
                 <div class="alert alert-info">
-                    Rejestracja przebiegła pomyślnie
+                    Signed up successfully.
                 </div>
             </div>
 
@@ -76,14 +82,14 @@
                          th:text="${error}">Validation error</div>
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-success">Zarejestruj</button>
-                    <span>Jesteś już zarejestrowany? <a href="/" th:href="@{/login}">Zaloguj się</a></span>
+                    <button type="submit" class="btn btn-success">Sign Up</button>
+                    <span>Signed up already? <a href="/" th:href="@{/login}">Sign In</a></span>
                 </div>
 
             </form>
         </div>
     </div>
-
+</div>
 
 </body>
 
